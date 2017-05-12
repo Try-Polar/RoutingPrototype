@@ -43,7 +43,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="BaseEntity.cs" />
+    <Compile Include="IUpdateDraw.cs" />
     <Compile Include="MovingEntity.cs" />
+    <Compile Include="Pod.cs" />
     <Compile Include="RoutingPrototype.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -102,9 +104,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="app.manifest" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Content\Pod.bmp" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Content\Textures\" />

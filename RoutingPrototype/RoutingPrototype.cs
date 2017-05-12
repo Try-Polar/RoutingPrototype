@@ -14,7 +14,12 @@ namespace RoutingPrototype
 
         Texture2D podTexture;
 
-        MovingEntity test;
+        Pod test;
+
+        int SCREEN_WIDTH = 800;
+        int SCREEN_HEIGHT = 600;
+
+        
 
         public RoutingPrototype()
         {
@@ -30,8 +35,10 @@ namespace RoutingPrototype
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
 
+            graphics.PreferredBackBufferWidth = SCREEN_WIDTH;
+            graphics.PreferredBackBufferHeight = SCREEN_HEIGHT;
+            graphics.ApplyChanges();
             base.Initialize();
         }
 
@@ -46,7 +53,7 @@ namespace RoutingPrototype
 
             podTexture = Content.Load<Texture2D>("Pod");
 
-            test = new MovingEntity(podTexture, Vector2.Zero);
+            test = new Pod(podTexture, Vector2.Zero, SCREEN_WIDTH, SCREEN_HEIGHT);
 
             // TODO: use this.Content to load your game content here
         }

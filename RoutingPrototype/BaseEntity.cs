@@ -46,12 +46,5 @@ namespace RoutingPrototype
             mRectangle.X = (int)pos.X;
             mRectangle.Y = (int)pos.Y;
         }
-
-
-        public abstract void Update(GameTime gameTime);
-
-        public abstract void Draw(SpriteBatch spriteBatch);
-
-
     }
 }
