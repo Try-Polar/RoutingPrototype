@@ -13,8 +13,10 @@ namespace RoutingPrototype
         SpriteBatch spriteBatch;
 
         Texture2D podTexture;
+        Texture2D destinationTexture;
+        Texture2D lineTexture; //a 1x1 texture
 
-        Pod test;
+        PodManager podManager;
 
         int SCREEN_WIDTH = 800;
         int SCREEN_HEIGHT = 600;
@@ -52,8 +54,11 @@ namespace RoutingPrototype
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             podTexture = Content.Load<Texture2D>("Pod");
+            destinationTexture = Content.Load<Texture2D>("Destination");
+            lineTexture = Content.Load<Texture2D>("Line");
 
-            test = new Pod(podTexture, Vector2.Zero, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+            podManager = new PodManager(podTexture, destinationTexture, lineTexture, SCREEN_WIDTH, SCREEN_HEIGHT);
 
             // TODO: use this.Content to load your game content here
         }
@@ -78,7 +83,7 @@ namespace RoutingPrototype
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            test.Update(gameTime);
+            podManager.Update(gameTime);
             
 
             base.Update(gameTime);
@@ -92,7 +97,7 @@ namespace RoutingPrototype
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            test.Draw(spriteBatch);
+            podManager.Draw(spriteBatch);
 
             base.Draw(gameTime);
         }
