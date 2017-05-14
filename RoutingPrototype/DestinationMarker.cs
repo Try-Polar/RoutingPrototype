@@ -10,7 +10,7 @@ namespace RoutingPrototype
 {
     class DestinationMarker : BaseEntity, IUpdateDraw
     {
-        Color color = Color.Red;
+        Color mColor = Color.Red;
 
         public DestinationMarker(Texture2D texture, Vector2 initialPosition) : base(texture, initialPosition)
         {
@@ -24,17 +24,22 @@ namespace RoutingPrototype
 
         public void colorYellow()
         {
-            color = Color.Yellow;
+            mColor = Color.Yellow;
         }
 
         public void colorRed()
         {
-            color = Color.Red;
+            mColor = Color.Red;
         }
 
         public void colorGreen()
         {
-            color = Color.LightGreen;
+            mColor = Color.LightGreen;
+        }
+
+        public Color currentColor()
+        {
+            return mColor;
         }
 
         public void setPosition(Vector2 pos)
@@ -46,7 +51,7 @@ namespace RoutingPrototype
         public void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Begin();
-            spriteBatch.Draw(this.Texture, this.Rect, color);
+            spriteBatch.Draw(this.Texture, this.Rect, mColor);
             spriteBatch.End();
         }
     }

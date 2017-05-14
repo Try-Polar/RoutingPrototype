@@ -17,6 +17,7 @@ namespace RoutingPrototype
         Texture2D lineTexture; //a 1x1 texture
 
         PodManager podManager;
+        RouteManager routeManager;
 
         int SCREEN_WIDTH = 800;
         int SCREEN_HEIGHT = 600;
@@ -57,8 +58,8 @@ namespace RoutingPrototype
             destinationTexture = Content.Load<Texture2D>("Destination");
             lineTexture = Content.Load<Texture2D>("Line");
 
-
-            podManager = new PodManager(podTexture, destinationTexture, lineTexture, SCREEN_WIDTH, SCREEN_HEIGHT);
+            routeManager = new RouteManager(destinationTexture, lineTexture, SCREEN_WIDTH, SCREEN_HEIGHT);
+            podManager = new PodManager(podTexture, destinationTexture, lineTexture, routeManager, SCREEN_WIDTH, SCREEN_HEIGHT);
 
             // TODO: use this.Content to load your game content here
         }
@@ -84,6 +85,7 @@ namespace RoutingPrototype
                 Exit();
 
             podManager.Update(gameTime);
+            routeManager.Update(gameTime);
             
 
             base.Update(gameTime);
@@ -98,6 +100,7 @@ namespace RoutingPrototype
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             podManager.Draw(spriteBatch);
+            routeManager.Draw(spriteBatch);
 
             base.Draw(gameTime);
         }

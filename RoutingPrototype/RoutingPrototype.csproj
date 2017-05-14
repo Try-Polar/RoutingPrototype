@@ -48,6 +48,8 @@
     <Compile Include="MovingEntity.cs" />
     <Compile Include="Pod.cs" />
     <Compile Include="PodManager.cs" />
+    <Compile Include="Route.cs" />
+    <Compile Include="RouteManager.cs" />
     <Compile Include="RoutingPrototype.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

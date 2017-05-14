@@ -46,5 +46,11 @@ namespace RoutingPrototype
             mRectangle.X = (int)pos.X;
             mRectangle.Y = (int)pos.Y;
         }
+
+        public void updateRectanglePos()
+        {
+            mRectangle.X = (int)mPos.X;
+            mRectangle.Y = (int)mPos.Y;
+        }
     }
 }

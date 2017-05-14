@@ -6,17 +6,17 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-enum STATUS {  PickingUp, DroppingOff} //might have more statuses later
+enum STATUS {  PickingUp, DroppingOff, Free} //might have more statuses later
 
 namespace RoutingPrototype
 {
     class Pod : MovingEntity, IUpdateDraw
-    {
-        Vector2 mPickup;
-        DestinationMarker mPickUpEntity;
-        Vector2 mDropOff;
-        DestinationMarker mDropOffEntity;
-        Vector2 target;
+    {        
+        Route mCurrentRoute;
+
+        Vector2 mTarget;
+
+        bool mRecentlyFreed = true;
 
         float VELOCITY = 300;
         float mMass = 0.05f;
@@ -30,7 +30,7 @@ namespace RoutingPrototype
         
 
         Random rnd;
-        STATUS currentStatus = STATUS.PickingUp; //initially Picking up
+        STATUS currentStatus = STATUS.Free; //initially Picking up
 
         public Pod(Texture2D texture, Texture2D markerTexture, Texture2D lineText, Vector2 initialPosition, int screenWidth, int screenHeight, int randomSeed) : base(texture, initialPosition)
         {
@@ -38,9 +38,8 @@ namespace RoutingPrototype
             sWidth = screenWidth;
             sHeight = screenHeight;
             maxVelocity = 1;
-            mPickUpEntity = new DestinationMarker(markerTexture, Vector2.Zero);
-            mDropOffEntity = new DestinationMarker(markerTexture, Vector2.Zero);
-            generateRandomSpawnPoint();
+
+            //generateRandomSpawnPoint();
             lineTexture = lineText;
             
         }
@@ -57,28 +56,25 @@ namespace RoutingPrototype
         {
             if (currentStatus == STATUS.PickingUp)
             {
-                mPickUpEntity.colorYellow();
-                mDropOffEntity.colorRed();
-                Vector2 distance = mPickup - Position;
+                Vector2 distance = mCurrentRoute.PickUp - Position;
                 if (distance.Length() <= 2) //going to assume 5 to essentially count as being there for now
                 {
                     //Velocity = Vector2.Zero; //gonna slow it down properly later
                     currentStatus = STATUS.DroppingOff;
+                    mCurrentRoute.pickUpComplete();
                 }
                 
             }
-            else
+            else if (currentStatus == STATUS.DroppingOff)
             {
-                mPickUpEntity.colorGreen();
-                mDropOffEntity.colorYellow();
-                Vector2 distance = mDropOff - Position;
+                Vector2 distance = mCurrentRoute.DropOff - Position;
                 if (distance.Length() <= 2) //going to assume 5 to essentially count as being there for now
                 {
                     //Velocity = Vector2.Zero; //gonna slow it down properly later
-                    currentStatus = STATUS.PickingUp;
-                    generateRandomSpawnPoint();
-                }
-                
+                    currentStatus = STATUS.Free;
+                    mRecentlyFreed = true;
+                    //generateRandomSpawnPoint();
+                }  
             }
         }
 
@@ -87,15 +83,16 @@ namespace RoutingPrototype
             //Update the velocity
             if (currentStatus == STATUS.PickingUp)
             {
-                target = mPickup;
+                mTarget = mCurrentRoute.PickUp;
             }
-            else
+            else if (currentStatus == STATUS.DroppingOff)
             {
-                target = mDropOff;
+                mTarget = mCurrentRoute.DropOff;
             }
+            //Maybe move back to some centralised point if free?
 
             
-            Vector2 acceleration = arrive(target) / mMass;
+            Vector2 acceleration = arrive(mTarget) / mMass;
             Velocity += acceleration * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             if (Velocity.Length() < maxVelocity)
@@ -109,34 +106,45 @@ namespace RoutingPrototype
             this.setRectanglePos(Position);
         }
 
-        
+        public bool isFree()
+        {
+            if (currentStatus == STATUS.Free)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            mPickUpEntity.Draw(spriteBatch);
-            mDropOffEntity.Draw(spriteBatch);
+
             //Check this works with multiple instances
             spriteBatch.Begin();
             spriteBatch.Draw(this.Texture, this.Rect, Color.White);
-            drawLine(spriteBatch, mPickup, mDropOff);
             spriteBatch.End();
         }
 
-        private void drawLine(SpriteBatch spriteBatch, Vector2 start, Vector2 end)
+        public bool RecentlyFreed
         {
-            start.X += mPickUpEntity.Texture.Width / 2;
-            end.X += mDropOffEntity.Texture.Width / 2;
-            start.Y += mPickUpEntity.Texture.Height / 2;
-            end.Y += mDropOffEntity.Texture.Height / 2;
-
-            Vector2 edge = end - start;
-
-            float angle = (float)Math.Atan2(edge.Y, edge.X);
-
-            spriteBatch.Draw(lineTexture, new Rectangle((int)start.X, (int)start.Y, (int)edge.Length(), 1), null, Color.Black, angle, new Vector2(0, 0), SpriteEffects.None, 0);
+            get { return mRecentlyFreed; }
+            set { mRecentlyFreed = value; }
         }
 
-        private void generateRandomSpawnPoint()
+        public Route CurrentRoute
+        {
+            get { return mCurrentRoute; }
+        }
+
+        public void clearRoute()
+        {
+            mCurrentRoute = null;
+        }
+        
+
+        /*private void generateRandomSpawnPoint()
         {
             //generate Pick up
             int x = rnd.Next(0, sWidth); //gonna change this to not allow spawning on the side windows later
@@ -151,9 +159,12 @@ namespace RoutingPrototype
             mDropOff.Y = y;
             mPickUpEntity.setPosition(mPickup);
             mDropOffEntity.setPosition(mDropOff);
-            Console.WriteLine(mPickup);
-            Console.WriteLine(mDropOff);
+        }*/
 
+        public void assignRoute(Route newRoute)
+        {
+            mCurrentRoute = newRoute;
+            currentStatus = STATUS.PickingUp;
         }
     }
 }
