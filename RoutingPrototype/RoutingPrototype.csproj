@@ -43,6 +43,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="BaseEntity.cs" />
+    <Compile Include="City.cs" />
+    <Compile Include="CityManager.cs" />
     <Compile Include="DestinationMarker.cs" />
     <Compile Include="IUpdateDraw.cs" />
     <Compile Include="MovingEntity.cs" />

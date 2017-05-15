@@ -13,7 +13,7 @@ namespace RoutingPrototype
         int mScreenWidth;
         int mScreenHeight;
 
-        float mSpawnInterval = 0.12f;
+        float mSpawnInterval = 0.2f;
         float mSpawnTimer = 0;
 
         List<Route> mUnassignedRoutes;
@@ -21,9 +21,11 @@ namespace RoutingPrototype
 
         Texture2D mMarkerTexture, mLineTexture;
 
+        CityManager cityManager;
+
         Random rnd;
 
-        public RouteManager(Texture2D markerText, Texture2D lineText, int screenWidth, int screenHeight)
+        public RouteManager(Texture2D markerText, Texture2D lineText, CityManager cityManager, int screenWidth, int screenHeight)
         {
             mScreenWidth = screenWidth;
             mScreenHeight = screenHeight;
@@ -32,6 +34,7 @@ namespace RoutingPrototype
             rnd = new Random();
             mUnassignedRoutes = new List<Route>();
             mAssignedRoutes = new List<Route>();
+            this.cityManager = cityManager;
         }
 
         public List<Route> UnassignedRoutes
@@ -65,9 +68,43 @@ namespace RoutingPrototype
         }
 
         //Generate a route based on locations of city objects
-        private void generateRealisticRoute()
+        private Route generateRealisticRoute()
         {
+            Vector2 pickUpLocation = Vector2.Zero;
+            Vector2 dropOffLocation = Vector2.Zero;
+            string a = "UNASSIGNED"; //default names to stop errors due to reference to unassigned variables, in practice these are always assigned to before use
+            string b = "ALSO UNASSIGNED";
+            int value = rnd.Next(0, cityManager.CombinedWeights);
+            foreach(City city in cityManager.Cities)
+            {
+                value -= city.Weighting;
 
+                if (value <= 0)
+                {
+                    pickUpLocation = city.Position;
+                    a = city.Name;
+                    break;
+                }
+            }
+
+            do
+            {
+                value = rnd.Next(0, cityManager.CombinedWeights);
+                foreach (City city in cityManager.Cities)
+                {
+                    value -= city.Weighting;
+                    if (value <= 0)
+                    {
+                        dropOffLocation = city.Position;
+                        b = city.Name;
+                        break;
+                    }
+                }
+            } while (a == b);
+
+            Route route = new Route(mMarkerTexture, mLineTexture, pickUpLocation, dropOffLocation);
+
+            return route;
         }
 
         public void Update(GameTime gameTime)
@@ -77,7 +114,8 @@ namespace RoutingPrototype
             {
                 mSpawnTimer = 0;
                 //Spawn a new route
-                mUnassignedRoutes.Add(generateRandomRoute());
+                //mUnassignedRoutes.Add(generateRandomRoute());
+                mUnassignedRoutes.Add(generateRealisticRoute());
             }
         }
 

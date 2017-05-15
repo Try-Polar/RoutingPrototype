@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -15,14 +16,21 @@ namespace RoutingPrototype
         Texture2D podTexture;
         Texture2D destinationTexture;
         Texture2D lineTexture; //a 1x1 texture
+        Texture2D cityTexture;
+        Texture2D background;
+        Rectangle backgroundRectangle;
 
         PodManager podManager;
         RouteManager routeManager;
+        CityManager cityManager;
 
-        int SCREEN_WIDTH = 800;
-        int SCREEN_HEIGHT = 600;
+        int SCREEN_WIDTH = 1200;
+        int SCREEN_HEIGHT = 900;
+        int MAP_WIDTH;
+        int MAP_HEIGHT;
 
-        
+        //FOR CREATION PURPOSES
+        bool mouseJustPressed = false;
 
         public RoutingPrototype()
         {
@@ -38,6 +46,10 @@ namespace RoutingPrototype
         /// </summary>
         protected override void Initialize()
         {
+            MAP_WIDTH = (int)(0.75f * SCREEN_WIDTH);
+            MAP_HEIGHT = SCREEN_HEIGHT;
+
+            this.IsMouseVisible = true;
 
             graphics.PreferredBackBufferWidth = SCREEN_WIDTH;
             graphics.PreferredBackBufferHeight = SCREEN_HEIGHT;
@@ -57,9 +69,13 @@ namespace RoutingPrototype
             podTexture = Content.Load<Texture2D>("Pod");
             destinationTexture = Content.Load<Texture2D>("Destination");
             lineTexture = Content.Load<Texture2D>("Line");
+            cityTexture = Content.Load<Texture2D>("City");
+            background = Content.Load<Texture2D>("Background");
+            backgroundRectangle = new Rectangle(0, 0, MAP_WIDTH, MAP_HEIGHT);
 
-            routeManager = new RouteManager(destinationTexture, lineTexture, SCREEN_WIDTH, SCREEN_HEIGHT);
-            podManager = new PodManager(podTexture, destinationTexture, lineTexture, routeManager, SCREEN_WIDTH, SCREEN_HEIGHT);
+            cityManager = new CityManager(cityTexture);
+            routeManager = new RouteManager(destinationTexture, lineTexture, cityManager, MAP_WIDTH, MAP_HEIGHT);
+            podManager = new PodManager(podTexture, destinationTexture, routeManager);
 
             // TODO: use this.Content to load your game content here
         }
@@ -86,7 +102,22 @@ namespace RoutingPrototype
 
             podManager.Update(gameTime);
             routeManager.Update(gameTime);
-            
+
+            //FOR THE PURPOSES OF SETTING UP CITIES ONLY
+            MouseState mouseState = Mouse.GetState();
+
+            if (mouseState.LeftButton == ButtonState.Pressed)
+            {
+                mouseJustPressed = true;
+            }
+            if (mouseState.LeftButton == ButtonState.Released && mouseJustPressed)
+            {
+                mouseJustPressed = false;
+                Vector2 mousePosition;
+                mousePosition.X = mouseState.X;
+                mousePosition.Y = mouseState.Y;
+                Console.WriteLine(mousePosition);
+            }
 
             base.Update(gameTime);
         }
@@ -98,9 +129,13 @@ namespace RoutingPrototype
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
-
+            spriteBatch.Begin();
+            spriteBatch.Draw(background, backgroundRectangle, Color.White);
+            spriteBatch.End();
+            cityManager.Draw(spriteBatch);
             podManager.Draw(spriteBatch);
             routeManager.Draw(spriteBatch);
+            
 
             base.Draw(gameTime);
         }

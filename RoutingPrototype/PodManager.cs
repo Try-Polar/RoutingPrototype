@@ -19,20 +19,15 @@ namespace RoutingPrototype
 
         int initialNumberOfPods = 25;
 
-        int sWidth;
-        int sHeight;
+
         Random rnd = new Random();
 
         RouteManager mRouteManager;
 
-        public PodManager(Texture2D podText, Texture2D destinationText, Texture2D lineText, RouteManager routeManager, int screenWidth, int screenHeight)
+        public PodManager(Texture2D podText, Texture2D destinationText, RouteManager routeManager)
         {
             mPodTexture = podText;
             mDestinationTexture = destinationText;
-            mLineTexture = lineText;
-
-            sWidth = screenWidth;
-            sHeight = screenHeight;
 
             mPods = new List<Pod>();
             mFreePods = new List<Pod>();
@@ -42,7 +37,7 @@ namespace RoutingPrototype
             //establish some number of pods
             for (int i = 0; i < initialNumberOfPods; i++)
             {
-                mPods.Add(new Pod(mPodTexture, mDestinationTexture, mLineTexture, Vector2.Zero, sWidth, sHeight, rnd.Next()));
+                mPods.Add(new Pod(mPodTexture, mDestinationTexture, new Vector2(727, 728), rnd.Next()));
             }
         }
 

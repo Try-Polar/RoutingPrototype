@@ -16,32 +16,26 @@ namespace RoutingPrototype
 
         Vector2 mTarget;
 
+        float mEnergy = 100;
+        float mMinimumEnergyThreshold = 5;
+        float mSufficientChargeThreshold = 95;
+        float mRechargeRate = 60;
+        bool mRecharging = false;
+
         bool mRecentlyFreed = true;
 
         float VELOCITY = 300;
         float mMass = 0.05f;
 
-        int sWidth;
-        int sHeight;
-
-        Texture2D lineTexture;
-
-        //Just making these numbers up for the time being
-        
 
         Random rnd;
         STATUS currentStatus = STATUS.Free; //initially Picking up
 
-        public Pod(Texture2D texture, Texture2D markerTexture, Texture2D lineText, Vector2 initialPosition, int screenWidth, int screenHeight, int randomSeed) : base(texture, initialPosition)
+        public Pod(Texture2D texture, Texture2D markerTexture, Vector2 initialPosition, int randomSeed) : base(texture, initialPosition)
         {
             rnd = new Random(randomSeed);
-            sWidth = screenWidth;
-            sHeight = screenHeight;
             maxVelocity = 1;
-
-            //generateRandomSpawnPoint();
-            lineTexture = lineText;
-            
+            mTarget = initialPosition;      
         }
 
         //This will be abstract in this class, just using this here to make a very quick demonstration
@@ -91,19 +85,41 @@ namespace RoutingPrototype
             }
             //Maybe move back to some centralised point if free?
 
-            
-            Vector2 acceleration = arrive(mTarget) / mMass;
-            Velocity += acceleration * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            if (Velocity.Length() < maxVelocity)
+            if (mEnergy < mMinimumEnergyThreshold)
             {
-                Velocity.Normalize();
-                Velocity = Velocity * maxVelocity;
+                mRecharging = true;
             }
+            if (!mRecharging)
+            { 
+                Vector2 acceleration = arrive(mTarget) / mMass;
+                Velocity += acceleration * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            //Update position based on current velocity
-            Position = Position + (Velocity * (float)gameTime.ElapsedGameTime.TotalSeconds) * VELOCITY;
-            this.setRectanglePos(Position);
+                if (Velocity.Length() < maxVelocity)
+                {
+                    Velocity.Normalize();
+                    Velocity = Velocity * maxVelocity;
+                }
+
+                //Update position based on current velocity
+                Vector2 distanceMoved = (Velocity * (float)gameTime.ElapsedGameTime.TotalSeconds) * VELOCITY;
+                Position = Position + distanceMoved;
+                //Deduct energy based on distance moved (going to need to scale things to be appropriate to actual map)
+                mEnergy -= distanceMoved.Length() * 0.17f;
+                if (mEnergy < 0)
+                    mEnergy = 0;
+            }
+            else //Recharge
+            {
+                mEnergy += (float)gameTime.ElapsedGameTime.TotalSeconds * mRechargeRate;
+                if (mEnergy > 100)
+                    mEnergy = 100;
+                if (mEnergy > mSufficientChargeThreshold)
+                {
+                    mRecharging = false;
+                }
+            }
+                this.setRectanglePos(Position);
         }
 
         public bool isFree()
@@ -143,24 +159,6 @@ namespace RoutingPrototype
             mCurrentRoute = null;
         }
         
-
-        /*private void generateRandomSpawnPoint()
-        {
-            //generate Pick up
-            int x = rnd.Next(0, sWidth); //gonna change this to not allow spawning on the side windows later
-            int y = rnd.Next(0, sHeight); //gonna change this to not allow spawning on the side windows later
-            mPickup.X = x;
-            mPickup.Y = y;
-
-            //generate Drop off
-            x = rnd.Next(0, sWidth);
-            y = rnd.Next(0, sHeight);
-            mDropOff.X = x;
-            mDropOff.Y = y;
-            mPickUpEntity.setPosition(mPickup);
-            mDropOffEntity.setPosition(mDropOff);
-        }*/
-
         public void assignRoute(Route newRoute)
         {
             mCurrentRoute = newRoute;
