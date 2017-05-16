@@ -74,10 +74,12 @@ namespace RoutingPrototype
                 Vector2 distance = mCurrentRoute.DropOff - Position;
                 if (distance.Length() <= 2) //going to assume 5 to essentially count as being there for now
                 {
-                    //Velocity = Vector2.Zero; //gonna slow it down properly later
                     currentStatus = STATUS.Free;
                     mRecentlyFreed = true;
-                    //generateRandomSpawnPoint();
+                    mInSkein = false;
+                    mInFormation = false;
+                    this.Skein = null;
+                    mColor = Color.White;
                 }  
             }
         }
@@ -120,7 +122,7 @@ namespace RoutingPrototype
                         else
                         {
                             toFormation.Normalize();
-                            toFormation = toFormation * Velocity.Length();// * 0.3f; //move towards the center but only effect current velocity by 30 percent of what it currently is 
+                            toFormation = toFormation * 5;//move towards the center but only effect current velocity by 30 percent of what it currently is 
                         }
                     }
                 }

@@ -16,7 +16,7 @@ namespace RoutingPrototype
         Texture2D mPodTexture;
         Texture2D mDestinationTexture;
 
-        int initialNumberOfPods = 5;
+        int initialNumberOfPods = 50;
 
 
         Random rnd = new Random();
@@ -60,7 +60,7 @@ namespace RoutingPrototype
                         if (!canSkip)
                         {
                             //Distance Check
-                            if ((otherPod.Position - pod.Position).Length() < 50)
+                            if ((otherPod.Position - pod.Position).Length() < 150)
                             {
                                 //Similar Route Check (order of this and distance check could be changed)                  
                                 float angle = angleBetweenVectors(pod.CurrentVector, otherPod.CurrentVector); //possibly check if they are in skein and if so use current skein vector
