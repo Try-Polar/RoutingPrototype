@@ -42,7 +42,7 @@ namespace RoutingPrototype
 
         protected Vector2 arrive(Vector2 targetPos)
         {
-            float deceleration = 200; //can tweak this to alter the deceleration speed
+            float deceleration = 100; //can tweak this to alter the deceleration speed
 
             Vector2 toTarget = targetPos - Position;
 

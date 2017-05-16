@@ -75,7 +75,7 @@ namespace RoutingPrototype
 
             cityManager = new CityManager(cityTexture, MAP_WIDTH, MAP_HEIGHT);
             routeManager = new RouteManager(destinationTexture, lineTexture, cityManager, MAP_WIDTH, MAP_HEIGHT);
-            podManager = new PodManager(podTexture, destinationTexture, routeManager);
+            podManager = new PodManager(podTexture, destinationTexture, routeManager, cityManager.Cities[0].Position);
 
             // TODO: use this.Content to load your game content here
         }

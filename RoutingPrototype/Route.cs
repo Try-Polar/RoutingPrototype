@@ -12,6 +12,7 @@ namespace RoutingPrototype
     {
         Vector2 mPickUp;
         Vector2 mDropOff;
+        Vector2 mRouteVector;
 
         DestinationMarker mPickUpEntity;
         DestinationMarker mDropOffEntity;
@@ -25,6 +26,7 @@ namespace RoutingPrototype
         {
             mPickUp = pickUpLoc;
             mDropOff = dropOffLoc;
+            mRouteVector = dropOffLoc - pickUpLoc;
             mAssigned = assigned;
             mPickUpEntity = new DestinationMarker(markerTexture, pickUpLoc);
             mDropOffEntity = new DestinationMarker(markerTexture, dropOffLoc);
@@ -43,6 +45,11 @@ namespace RoutingPrototype
         {
             get { return mDropOff; }
             set { mDropOff = value; }
+        }
+
+        public Vector2 RouteVector
+        {
+            get { return mRouteVector; }
         }
 
         public bool isAssigned

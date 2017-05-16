@@ -24,23 +24,25 @@ namespace RoutingPrototype
         {
             mCities = new List<City>();
             cityTexture = cityText;
-            mWidthScaler = mapWidth / 900;
-            mHeightScaler = mapHeight / 900;
+            mWidthScaler = (float)mapWidth / 900;
+            Console.WriteLine(mWidthScaler);
+            mHeightScaler = (float)mapHeight / 900;
+            Console.WriteLine(mHeightScaler);
             setupCities();
         }
 
         void setupCities()
         {
-            mCities.Add(new City(cityTexture, new Vector2(727, 728), "London", 40));
-            mCities.Add(new City(cityTexture, new Vector2(456, 294), "Glasgow", 5));
-            mCities.Add(new City(cityTexture, new Vector2(538, 299), "Edinburgh", 10));
-            mCities.Add(new City(cityTexture, new Vector2(630, 378), "Newcastle", 5));
-            mCities.Add(new City(cityTexture, new Vector2(615, 488), "Leeds", 5));
-            mCities.Add(new City(cityTexture, new Vector2(589, 522), "Manchester", 10));
-            mCities.Add(new City(cityTexture, new Vector2(568, 554), "Liverpool", 5));
-            mCities.Add(new City(cityTexture, new Vector2(610, 636), "Birmingham", 10));
-            mCities.Add(new City(cityTexture, new Vector2(529, 727), "Cardiff", 5));
-            mCities.Add(new City(cityTexture, new Vector2(559, 749), "Bristol", 5));
+            mCities.Add(new City(cityTexture, new Vector2(727 * mWidthScaler, 728 * mHeightScaler), "London", 40));
+            mCities.Add(new City(cityTexture, new Vector2(456 * mWidthScaler, 294 * mHeightScaler), "Glasgow", 5));
+            mCities.Add(new City(cityTexture, new Vector2(538 * mWidthScaler, 299 * mHeightScaler), "Edinburgh", 10));
+            mCities.Add(new City(cityTexture, new Vector2(630 * mWidthScaler, 378 * mHeightScaler), "Newcastle", 5));
+            mCities.Add(new City(cityTexture, new Vector2(615 * mWidthScaler, 488 * mHeightScaler), "Leeds", 5));
+            mCities.Add(new City(cityTexture, new Vector2(589 * mWidthScaler, 522 * mHeightScaler), "Manchester", 10));
+            mCities.Add(new City(cityTexture, new Vector2(568 * mWidthScaler, 554 * mHeightScaler), "Liverpool", 5));
+            mCities.Add(new City(cityTexture, new Vector2(610 * mWidthScaler, 636 * mHeightScaler), "Birmingham", 10));
+            mCities.Add(new City(cityTexture, new Vector2(529 * mWidthScaler, 727 * mHeightScaler), "Cardiff", 5));
+            mCities.Add(new City(cityTexture, new Vector2(559 * mWidthScaler, 749 * mHeightScaler), "Bristol", 5));
 
             mCombinedWeights = getCombinedWeights();
         }

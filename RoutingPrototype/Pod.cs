@@ -14,7 +14,17 @@ namespace RoutingPrototype
     {        
         Route mCurrentRoute;
 
+        bool mInSkein = false;
+        bool mIsLeader = false;
+        bool mInFormation = false;
+
+        public Skein Skein;
+
+        Color mColor = Color.White;
+
         Vector2 mTarget;
+
+        Vector2 mCurrentVector;
 
         float mEnergy = 100;
         float mMinimumEnergyThreshold = 5;
@@ -35,7 +45,7 @@ namespace RoutingPrototype
         {
             rnd = new Random(randomSeed);
             maxVelocity = 1;
-            mTarget = initialPosition;      
+            mTarget = initialPosition;
         }
 
         //This will be abstract in this class, just using this here to make a very quick demonstration
@@ -43,7 +53,7 @@ namespace RoutingPrototype
         {
             checkStatus();
             movement(gameTime);
-            
+            mCurrentVector = mTarget - Position;
         }
 
         private void checkStatus()
@@ -92,14 +102,36 @@ namespace RoutingPrototype
             }
             if (!mRecharging)
             { 
+                
                 Vector2 acceleration = arrive(mTarget) / mMass;
                 Velocity += acceleration * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                //mColor = Color.White;
+                Vector2 toFormation = Vector2.Zero;
+                if (mInSkein)
+                {
+                    if (!mInFormation)
+                    {
+                        toFormation = this.Skein.getCurrentCenter() - Position;
+                        if (toFormation.Length() < 1)
+                        {
+                            mInFormation = true;
+                            mColor = Color.Green;
+                        }
+                        else
+                        {
+                            toFormation.Normalize();
+                            toFormation = toFormation * Velocity.Length();// * 0.3f; //move towards the center but only effect current velocity by 30 percent of what it currently is 
+                        }
+                    }
+                }
+                Velocity += toFormation * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
                 if (Velocity.Length() < maxVelocity)
                 {
                     Velocity.Normalize();
                     Velocity = Velocity * maxVelocity;
                 }
+                
 
                 //Update position based on current velocity
                 Vector2 distanceMoved = (Velocity * (float)gameTime.ElapsedGameTime.TotalSeconds) * VELOCITY;
@@ -139,7 +171,7 @@ namespace RoutingPrototype
 
             //Check this works with multiple instances
             spriteBatch.Begin();
-            spriteBatch.Draw(this.Texture, this.Rect, Color.White);
+            spriteBatch.Draw(this.Texture, this.Rect, mColor);
             spriteBatch.End();
         }
 
@@ -149,9 +181,32 @@ namespace RoutingPrototype
             set { mRecentlyFreed = value; }
         }
 
+        public bool inSkein
+        {
+            get { return mInSkein; }
+            set { mInSkein = value; }
+        }
+
+        public bool isLeader
+        {
+            get { return mIsLeader; }
+            set { mIsLeader = value; }
+        }
+
+        public bool inFormation
+        {
+            get { return mInFormation; }
+            set { mInFormation = value; }
+        }
+
         public Route CurrentRoute
         {
             get { return mCurrentRoute; }
+        }
+
+        public Vector2 CurrentVector
+        {   
+            get { return mCurrentVector; }
         }
 
         public void clearRoute()
