@@ -17,10 +17,15 @@ namespace RoutingPrototype
 
         int mCombinedWeights = 100;
 
-        public CityManager(Texture2D cityText)
+        int mMapWidth, mMapHeight;
+        float mWidthScaler, mHeightScaler;
+
+        public CityManager(Texture2D cityText, int mapWidth, int mapHeight)
         {
             mCities = new List<City>();
             cityTexture = cityText;
+            mWidthScaler = mapWidth / 900;
+            mHeightScaler = mapHeight / 900;
             setupCities();
         }
 

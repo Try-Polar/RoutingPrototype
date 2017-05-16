@@ -17,7 +17,7 @@ namespace RoutingPrototype
         Texture2D mDestinationTexture;
         Texture2D mLineTexture;
 
-        int initialNumberOfPods = 25;
+        int initialNumberOfPods = 125;
 
 
         Random rnd = new Random();

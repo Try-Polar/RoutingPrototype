@@ -73,7 +73,7 @@ namespace RoutingPrototype
             background = Content.Load<Texture2D>("Background");
             backgroundRectangle = new Rectangle(0, 0, MAP_WIDTH, MAP_HEIGHT);
 
-            cityManager = new CityManager(cityTexture);
+            cityManager = new CityManager(cityTexture, MAP_WIDTH, MAP_HEIGHT);
             routeManager = new RouteManager(destinationTexture, lineTexture, cityManager, MAP_WIDTH, MAP_HEIGHT);
             podManager = new PodManager(podTexture, destinationTexture, routeManager);
 

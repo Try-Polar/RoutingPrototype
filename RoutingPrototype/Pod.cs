@@ -24,7 +24,7 @@ namespace RoutingPrototype
 
         bool mRecentlyFreed = true;
 
-        float VELOCITY = 300;
+        float VELOCITY = 100;
         float mMass = 0.05f;
 
 
