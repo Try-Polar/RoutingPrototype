@@ -31,26 +31,33 @@ namespace RoutingPrototype
         float mSufficientChargeThreshold = 95;
         float mRechargeRate = 60;
         bool mRecharging = false;
+        float distanceScaler = 0.25f;
+        float maxDistance;
 
         bool mRecentlyFreed = true;
+        bool mGoingToCharge = false;
 
         float VELOCITY = 100;
         float mMass = 0.05f;
 
+        CityManager mCityManager;
 
         Random rnd;
         STATUS currentStatus = STATUS.Free; //initially Picking up
 
-        public Pod(Texture2D texture, Texture2D markerTexture, Vector2 initialPosition, int randomSeed) : base(texture, initialPosition)
+        public Pod(Texture2D texture, Texture2D markerTexture, Vector2 initialPosition, CityManager cityManager, int randomSeed) : base(texture, initialPosition)
         {
             rnd = new Random(randomSeed);
             maxVelocity = 1;
             mTarget = initialPosition;
+            mCityManager = cityManager;
+            maxDistance = 100 / distanceScaler;
         }
 
         //This will be abstract in this class, just using this here to make a very quick demonstration
         public void Update(GameTime gameTime)
         {
+            
             checkStatus();
             movement(gameTime);
             mCurrentVector = mTarget - Position;
@@ -60,19 +67,18 @@ namespace RoutingPrototype
         {
             if (currentStatus == STATUS.PickingUp)
             {
-                Vector2 distance = mCurrentRoute.PickUp - Position;
-                if (distance.Length() <= 2) //going to assume 5 to essentially count as being there for now
+                float distance = distanceTo(mCurrentRoute.PickUp);
+                if (distance <= 2) //going to assume 5 to essentially count as being there for now
                 {
                     //Velocity = Vector2.Zero; //gonna slow it down properly later
                     currentStatus = STATUS.DroppingOff;
                     mCurrentRoute.pickUpComplete();
-                }
-                
+                }                
             }
             else if (currentStatus == STATUS.DroppingOff)
             {
-                Vector2 distance = mCurrentRoute.DropOff - Position;
-                if (distance.Length() <= 2) //going to assume 5 to essentially count as being there for now
+                float distance = distanceTo(mCurrentRoute.DropOff);
+                if (distance <= 2) //going to assume 5 to essentially count as being there for now
                 {
                     currentStatus = STATUS.Free;
                     mRecentlyFreed = true;
@@ -87,14 +93,56 @@ namespace RoutingPrototype
         private void movement(GameTime gameTime)
         {
             //Update the velocity
-            if (currentStatus == STATUS.PickingUp)
+            if (!mGoingToCharge)
             {
-                mTarget = mCurrentRoute.PickUp;
+                if (distanceTo(mTarget) > distanceAvailable() && !mRecharging)
+                {
+                    City chargingPoint = findBestChargingPoint();
+                    if (chargingPoint != null)
+                    {
+                        mGoingToCharge = true;
+                        mRecharging = false;
+                        mTarget = chargingPoint.Position;
+                    }
+                    else
+                    {
+                        mRecharging = true;
+                        mEnergy += (float)gameTime.ElapsedGameTime.TotalSeconds * mRechargeRate;
+                        if (mEnergy > 100)
+                        {
+                            mEnergy = 100;
+                            mGoingToCharge = false;
+                            mRecharging = false;
+                        }
+                    }
+                }
+                else
+                {
+                    if (currentStatus == STATUS.PickingUp)
+                    {
+                        mTarget = mCurrentRoute.PickUp;
+                    }
+                    else if (currentStatus == STATUS.DroppingOff)
+                    {
+                        mTarget = mCurrentRoute.DropOff;
+                    }
+                }
             }
-            else if (currentStatus == STATUS.DroppingOff)
+            else
             {
-                mTarget = mCurrentRoute.DropOff;
+                if (distanceTo(mTarget) < 1)
+                {
+                    mRecharging = true;
+                    mEnergy += (float)gameTime.ElapsedGameTime.TotalSeconds * mRechargeRate;
+                    if (mEnergy > 100)
+                    {
+                        mEnergy = 100;
+                        mGoingToCharge = false;
+                        mRecharging = false;
+                    }
+                }
             }
+            
             //Maybe move back to some centralised point if free?
 
 
@@ -105,28 +153,44 @@ namespace RoutingPrototype
             if (!mRecharging)
             { 
                 
+                
+                Vector2 toFormation = Vector2.Zero;
+                if (mInSkein && currentStatus != STATUS.Free)
+                {
+                    if ((mCurrentRoute.DropOff - Position).Length() > 10)
+                    {
+                        //Velocity += relativeSeek(this.Skein.getCurrentVector(), this.Skein.getCurrentCenter()) * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                        if (!mInFormation)
+                        {
+                            toFormation = this.Skein.getCurrentCenter() - Position;
+                            if (toFormation.Length() < 1)
+                            {
+                                mInFormation = true;
+                                mColor = Color.Green;
+                            }
+                            else
+                            {
+                                mColor = Color.Yellow;
+                                toFormation.Normalize();
+                                toFormation = toFormation * 5;//move towards the center but only effect current velocity by 30 percent of what it currently is 
+                            }
+                        }
+                        Velocity += toFormation * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    }
+                    else
+                    {
+                        //Leave Skein
+                        this.Skein.remove(this);
+                        this.Skein = null;
+                        mInSkein = false;
+                        mInFormation = false;
+                        mColor = Color.White;
+                    }
+                    
+                }
+
                 Vector2 acceleration = arrive(mTarget) / mMass;
                 Velocity += acceleration * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                //mColor = Color.White;
-                Vector2 toFormation = Vector2.Zero;
-                if (mInSkein)
-                {
-                    if (!mInFormation)
-                    {
-                        toFormation = this.Skein.getCurrentCenter() - Position;
-                        if (toFormation.Length() < 1)
-                        {
-                            mInFormation = true;
-                            mColor = Color.Green;
-                        }
-                        else
-                        {
-                            toFormation.Normalize();
-                            toFormation = toFormation * 5;//move towards the center but only effect current velocity by 30 percent of what it currently is 
-                        }
-                    }
-                }
-                Velocity += toFormation * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
                 if (Velocity.Length() < maxVelocity)
                 {
@@ -139,7 +203,7 @@ namespace RoutingPrototype
                 Vector2 distanceMoved = (Velocity * (float)gameTime.ElapsedGameTime.TotalSeconds) * VELOCITY;
                 Position = Position + distanceMoved;
                 //Deduct energy based on distance moved (going to need to scale things to be appropriate to actual map)
-                mEnergy -= distanceMoved.Length() * 0.17f;
+                mEnergy -= distanceMoved.Length() * distanceScaler;
                 if (mEnergy < 0)
                     mEnergy = 0;
             }
@@ -166,6 +230,56 @@ namespace RoutingPrototype
             {
                 return false;
             }
+        }
+
+        public void skeinDispersed()
+        {
+            inSkein = false;
+            inFormation = false;
+            this.Skein = null;
+            mColor = Color.White;
+        }
+
+        float distanceAvailable()
+        {
+            return mEnergy / distanceScaler;
+        }
+
+        float distanceTo(Vector2 loc)
+        {
+            return (loc - Position).Length();
+        }
+
+        float distanceBetween(Vector2 a, Vector2 b)
+        {
+            return (a - b).Length();
+        }
+
+        City findBestChargingPoint()
+        {
+            float bestDistanceToTarget = 9999999;
+            City bestCity = null;
+            foreach (City city in mCityManager.Cities)
+            {
+                if (distanceTo(city.Position) < distanceAvailable())
+                {
+                    if (distanceBetween(city.Position, mTarget) < bestDistanceToTarget)
+                    {
+                        bestCity = city;
+                        bestDistanceToTarget = distanceBetween(city.Position, mTarget);
+                    }
+                }
+            }
+
+            return bestCity;
+        }
+
+        Vector2 relativeSeek(Vector2 targetPos, Vector2 otherPos)
+        {
+            Vector2 direction = targetPos - otherPos;
+            direction.Normalize();
+            direction = direction * maxVelocity;
+            return direction;
         }
 
         public void Draw(SpriteBatch spriteBatch)

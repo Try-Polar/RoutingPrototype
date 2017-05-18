@@ -13,7 +13,7 @@ namespace RoutingPrototype
         int mScreenWidth;
         int mScreenHeight;
 
-        float mSpawnInterval = 0.2f;
+        float mSpawnInterval = 0.5f;
         float mSpawnTimer = 0;
 
         List<Route> mUnassignedRoutes;
@@ -117,6 +117,11 @@ namespace RoutingPrototype
                 //mUnassignedRoutes.Add(generateRandomRoute());
                 mUnassignedRoutes.Add(generateRealisticRoute());
             }
+        }
+
+        public CityManager CityManager
+        {
+            get { return cityManager; }
         }
 
         //This will most likely be redundant but oh well

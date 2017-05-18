@@ -22,10 +22,34 @@ namespace RoutingPrototype
             mMembers.Add(other);
         }
 
-        /*public Vector2 getCurrentVector()
+        public Vector2 getCurrentVector()
         {
+            Vector2 currentVector = Vector2.Zero;
+            foreach (Pod pod in mMembers)
+            {
+                currentVector += pod.CurrentRoute.DropOff;
+            }
 
-        }*/
+            return (currentVector / mMembers.Count) - getCurrentCenter();
+        }
+
+        public void remove(Pod pod)
+        {
+            mMembers.Remove(pod);
+            if (pod == mLeader)
+            {
+                if (mMembers.Count > 2)
+                {
+                    //assign new leader
+                    mLeader = mMembers.First();
+                    mLeader.isLeader = true;
+                }
+                else if (mMembers.Count == 1)
+                {
+                    mMembers.First().skeinDispersed();
+                }
+            }
+        }
 
         public List<Pod> Members
         {
