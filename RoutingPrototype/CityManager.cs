@@ -44,6 +44,9 @@ namespace RoutingPrototype
             mCities.Add(new City(cityTexture, new Vector2(529 * mWidthScaler, 727 * mHeightScaler), "Cardiff", 5));
             mCities.Add(new City(cityTexture, new Vector2(559 * mWidthScaler, 749 * mHeightScaler), "Bristol", 5));
 
+            //mCities.Add(new City(cityTexture, new Vector2(500 * mWidthScaler, 700 * mHeightScaler), "TestA", 10));
+            //mCities.Add(new City(cityTexture, new Vector2(500 * mWidthScaler, 500 * mHeightScaler), "TestB", 10));
+
             mCombinedWeights = getCombinedWeights();
         }
 

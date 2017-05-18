@@ -13,7 +13,7 @@ namespace RoutingPrototype
         int mScreenWidth;
         int mScreenHeight;
 
-        float mSpawnInterval = 0.5f;
+        float mSpawnInterval = 0.2f;
         float mSpawnTimer = 0;
 
         List<Route> mUnassignedRoutes;

@@ -18,6 +18,8 @@ namespace RoutingPrototype
 
         int initialNumberOfPods = 50;
 
+        int currentId = 1;
+
 
         Random rnd = new Random();
 
@@ -36,7 +38,7 @@ namespace RoutingPrototype
             //establish some number of pods
             for (int i = 0; i < initialNumberOfPods; i++)
             {
-                mPods.Add(new Pod(mPodTexture, mDestinationTexture, startLocation, routeManager.CityManager, rnd.Next()));
+                mPods.Add(new Pod(mPodTexture, mDestinationTexture, startLocation, routeManager.CityManager, rnd.Next(), currentId++));
             }
         }
 
@@ -64,8 +66,9 @@ namespace RoutingPrototype
                             {
                                 //Similar Route Check (order of this and distance check could be changed)                  
                                 float angle = angleBetweenVectors(pod.CurrentVector, otherPod.CurrentVector); //possibly check if they are in skein and if so use current skein vector
-                                                                                                              //          0.261799 = 15 deg   6.02139 = 245 deg
+
                                 if ((angle < 0.261799 && angle > 0) || (angle > 6.02139 && angle < 6.28319))
+                                //if ((angle < 1 && angle > 0) || (angle > 5 && angle < 6.28319))
                                 {
                                     //Assign pods to be in a skein
                                     if (!pod.inSkein && !otherPod.inSkein)
@@ -165,16 +168,9 @@ namespace RoutingPrototype
 
         float angleBetweenVectors(Vector2 a, Vector2 b)
         {
-            float dot = dotProduct(a, b);
-            return (float)Math.Acos((a.Length() * b.Length()) / (dot));
-        }
-
-        float dotProduct(Vector2 a, Vector2 b)
-        {
-            float total = 0;
-            total += a.X * b.X;
-            total += a.Y * b.Y;
-            return total;
+            a.Normalize();
+            b.Normalize();
+            return (float)Math.Acos(Vector2.Dot(a, b));
         }
     }
 }

@@ -27,10 +27,10 @@ namespace RoutingPrototype
             Vector2 currentVector = Vector2.Zero;
             foreach (Pod pod in mMembers)
             {
-                currentVector += pod.CurrentRoute.DropOff;
+                currentVector += pod.CurrentVector;
             }
 
-            return (currentVector / mMembers.Count) - getCurrentCenter();
+            return (currentVector / mMembers.Count);
         }
 
         public void remove(Pod pod)
@@ -64,14 +64,12 @@ namespace RoutingPrototype
 
         public Vector2 getCurrentCenter()
         {
-            int i = 0;
             Vector2 center = Vector2.Zero;
             foreach (Pod pod in mMembers)
             {
-                i++;
                 center += pod.Position;
             }
-            return center / i;
+            return center / mMembers.Count;
         }
     }
 }

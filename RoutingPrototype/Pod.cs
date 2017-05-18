@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-enum STATUS {  PickingUp, DroppingOff, Free} //might have more statuses later
+enum STATUS {  PickingUp, DroppingOff, Free, GoingToCharge} //might have more statuses later
 
 namespace RoutingPrototype
 {
@@ -22,7 +22,9 @@ namespace RoutingPrototype
 
         Color mColor = Color.White;
 
-        Vector2 mTarget;
+        Vector2 mTarget; //This is where the pod is directly aiming to go at any given moment
+
+        Vector2 mGoal; // This is where the pod actually wants to end up (for example the goal would be the city the pod wants to go to while the target may be the point it is going to meet other pods)
 
         Vector2 mCurrentVector;
 
@@ -33,6 +35,8 @@ namespace RoutingPrototype
         bool mRecharging = false;
         float distanceScaler = 0.25f;
         float maxDistance;
+
+        int id;
 
         bool mRecentlyFreed = true;
         bool mGoingToCharge = false;
@@ -45,11 +49,12 @@ namespace RoutingPrototype
         Random rnd;
         STATUS currentStatus = STATUS.Free; //initially Picking up
 
-        public Pod(Texture2D texture, Texture2D markerTexture, Vector2 initialPosition, CityManager cityManager, int randomSeed) : base(texture, initialPosition)
+        public Pod(Texture2D texture, Texture2D markerTexture, Vector2 initialPosition, CityManager cityManager, int randomSeed, int podId) : base(texture, initialPosition)
         {
+            id = podId;
             rnd = new Random(randomSeed);
             maxVelocity = 1;
-            mTarget = initialPosition;
+            mGoal = initialPosition;
             mCityManager = cityManager;
             maxDistance = 100 / distanceScaler;
         }
@@ -57,10 +62,10 @@ namespace RoutingPrototype
         //This will be abstract in this class, just using this here to make a very quick demonstration
         public void Update(GameTime gameTime)
         {
-            
+            mCurrentVector = mGoal - Position;
             checkStatus();
             movement(gameTime);
-            mCurrentVector = mTarget - Position;
+            
         }
 
         private void checkStatus()
@@ -68,9 +73,8 @@ namespace RoutingPrototype
             if (currentStatus == STATUS.PickingUp)
             {
                 float distance = distanceTo(mCurrentRoute.PickUp);
-                if (distance <= 2) //going to assume 5 to essentially count as being there for now
+                if (distance <= 2)
                 {
-                    //Velocity = Vector2.Zero; //gonna slow it down properly later
                     currentStatus = STATUS.DroppingOff;
                     mCurrentRoute.pickUpComplete();
                 }                
@@ -78,7 +82,7 @@ namespace RoutingPrototype
             else if (currentStatus == STATUS.DroppingOff)
             {
                 float distance = distanceTo(mCurrentRoute.DropOff);
-                if (distance <= 2) //going to assume 5 to essentially count as being there for now
+                if (distance <= 2)
                 {
                     currentStatus = STATUS.Free;
                     mRecentlyFreed = true;
@@ -92,45 +96,37 @@ namespace RoutingPrototype
 
         private void movement(GameTime gameTime)
         {
-            //Update the velocity
             if (!mGoingToCharge)
             {
-                if (distanceTo(mTarget) > distanceAvailable() && !mRecharging)
+                if (currentStatus == STATUS.PickingUp)
+                {
+                    mGoal = mCurrentRoute.PickUp;
+                    mTarget = mGoal;
+
+                }
+                else if (currentStatus == STATUS.DroppingOff)
+                {
+                    mGoal = mCurrentRoute.DropOff;
+                    mTarget = mGoal;
+
+                }
+
+                if (distanceTo(mGoal) > distanceAvailable() && !mRecharging) //Maybe should be target NOT GOAL
                 {
                     City chargingPoint = findBestChargingPoint();
                     if (chargingPoint != null)
                     {
                         mGoingToCharge = true;
                         mRecharging = false;
-                        mTarget = chargingPoint.Position;
-                    }
-                    else
-                    {
-                        mRecharging = true;
-                        mEnergy += (float)gameTime.ElapsedGameTime.TotalSeconds * mRechargeRate;
-                        if (mEnergy > 100)
-                        {
-                            mEnergy = 100;
-                            mGoingToCharge = false;
-                            mRecharging = false;
-                        }
+                        mGoal = chargingPoint.Position;
+
                     }
                 }
-                else
-                {
-                    if (currentStatus == STATUS.PickingUp)
-                    {
-                        mTarget = mCurrentRoute.PickUp;
-                    }
-                    else if (currentStatus == STATUS.DroppingOff)
-                    {
-                        mTarget = mCurrentRoute.DropOff;
-                    }
-                }
+                mTarget = mGoal; //Might seem redundant, to do this right after setting mGoal, but mTarget is likely to change while mGoal will not
             }
             else
             {
-                if (distanceTo(mTarget) < 1)
+                if (distanceTo(mGoal) < 1)
                 {
                     mRecharging = true;
                     mEnergy += (float)gameTime.ElapsedGameTime.TotalSeconds * mRechargeRate;
@@ -152,30 +148,39 @@ namespace RoutingPrototype
             }
             if (!mRecharging)
             { 
-                
-                
-                Vector2 toFormation = Vector2.Zero;
                 if (mInSkein && currentStatus != STATUS.Free)
                 {
-                    if ((mCurrentRoute.DropOff - Position).Length() > 10)
+                    if ((mGoal - Position).Length() > 50)
                     {
-                        //Velocity += relativeSeek(this.Skein.getCurrentVector(), this.Skein.getCurrentCenter()) * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                        if (!mInFormation)
+                        if (Vector2.Distance(Position, this.Skein.getCurrentCenter()) > 5)
                         {
-                            toFormation = this.Skein.getCurrentCenter() - Position;
-                            if (toFormation.Length() < 1)
-                            {
-                                mInFormation = true;
-                                mColor = Color.Green;
-                            }
-                            else
-                            {
-                                mColor = Color.Yellow;
-                                toFormation.Normalize();
-                                toFormation = toFormation * 5;//move towards the center but only effect current velocity by 30 percent of what it currently is 
-                            }
+                            //Find meeting point
+                            //Vector2 meetingPoint = findMeetingPoint();
+                            //Console.WriteLine(this.Skein.getCurrentCenter());
+                            Vector2 meetingVector = Normalize((this.Skein.getCurrentCenter() - Position));
+                            //Console.WriteLine("toCenter: " + Normalize(meetingVector));
+                            meetingVector += Normalize(mGoal - Position);
+                            //Console.WriteLine("toGoal: " + Normalize(mGoal - Position));
+                            //Console.WriteLine("Overall: " + meetingVector);
+                            mColor = Color.Yellow;
+                            mInFormation = false;
+                            //Console.WriteLine("PreMeetingVector" + id + ": " + meetingVector);
+                            meetingVector *= Vector2.Distance(mGoal, Position);
+                            mTarget = meetingVector + Position;
+                            //mTarget *= Vector2.Distance(mGoal, Position);
+                            //Console.WriteLine("PosMeetingVector" + id +": " + meetingVector);
+                            //Console.WriteLine("Target" + id + ": " + mTarget);
+                            //Console.WriteLine("Length: " + mTarget.Length());         
                         }
-                        Velocity += toFormation * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                        else
+                        {
+                            //Console.WriteLine("ASCENION ACHIEVED");
+                            mInFormation = true;
+                            mColor = Color.Green;
+                            //Console.WriteLine("SkeinVector" + id + ": " + this.Skein.getCurrentVector());
+                            mTarget = Position + (Normalize(this.Skein.getCurrentVector()) * Vector2.Distance(mGoal, Position));
+                            //Console.WriteLine("Target" + id + ": " + mTarget);
+                        }
                     }
                     else
                     {
@@ -190,18 +195,19 @@ namespace RoutingPrototype
                 }
 
                 Vector2 acceleration = arrive(mTarget) / mMass;
+                //Console.WriteLine("Aceceleration: " + acceleration);
                 Velocity += acceleration * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                //Console.WriteLine("Velocity: " + Velocity);
 
-                if (Velocity.Length() < maxVelocity)
+                if (Velocity.Length() > maxVelocity)
                 {
-                    Velocity.Normalize();
-                    Velocity = Velocity * maxVelocity;
+                    Velocity *= maxVelocity / Velocity.Length();
                 }
-                
 
                 //Update position based on current velocity
                 Vector2 distanceMoved = (Velocity * (float)gameTime.ElapsedGameTime.TotalSeconds) * VELOCITY;
                 Position = Position + distanceMoved;
+                //Console.WriteLine(Position);
                 //Deduct energy based on distance moved (going to need to scale things to be appropriate to actual map)
                 mEnergy -= distanceMoved.Length() * distanceScaler;
                 if (mEnergy < 0)
@@ -263,10 +269,10 @@ namespace RoutingPrototype
             {
                 if (distanceTo(city.Position) < distanceAvailable())
                 {
-                    if (distanceBetween(city.Position, mTarget) < bestDistanceToTarget)
+                    if (distanceBetween(city.Position, mGoal) < bestDistanceToTarget)
                     {
                         bestCity = city;
-                        bestDistanceToTarget = distanceBetween(city.Position, mTarget);
+                        bestDistanceToTarget = distanceBetween(city.Position, mGoal);
                     }
                 }
             }
@@ -280,6 +286,17 @@ namespace RoutingPrototype
             direction.Normalize();
             direction = direction * maxVelocity;
             return direction;
+        }
+
+        Vector2 Normalize(Vector2 V) //This should be totally unecessary but from what I've tested I am unsure that the built-in normalize function actually works
+        {
+            return V / V.Length();
+        }
+
+        Vector2 findMeetingPoint()
+        {
+            Vector2 center = this.Skein.getCurrentCenter();
+            return center + (Normalize(this.Skein.getCurrentVector()) * Vector2.Distance(Position, center));
         }
 
         public void Draw(SpriteBatch spriteBatch)
