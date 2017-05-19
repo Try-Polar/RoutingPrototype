@@ -16,7 +16,7 @@ namespace RoutingPrototype
         Texture2D mPodTexture;
         Texture2D mDestinationTexture;
 
-        int initialNumberOfPods = 50;
+        int initialNumberOfPods = 100;
 
         int currentId = 1;
 
@@ -34,6 +34,10 @@ namespace RoutingPrototype
             mFreePods = new List<Pod>();
 
             mRouteManager = routeManager;
+            //For testing purposes only---
+            //mPods.Add(new Pod(mPodTexture, mDestinationTexture, new Vector2(615, 488), routeManager.CityManager, rnd.Next(), currentId++));
+            //mPods.Add(new Pod(mPodTexture, mDestinationTexture, new Vector2(589, 522), routeManager.CityManager, rnd.Next(), currentId++));
+            //----------------------------
 
             //establish some number of pods
             for (int i = 0; i < initialNumberOfPods; i++)
@@ -46,59 +50,55 @@ namespace RoutingPrototype
         {
             foreach (Pod pod in mPods)
             {
-                foreach (Pod otherPod in mPods)
+                if (!pod.onFinalApproach && pod.Velocity.Length() > 0.00001f)
                 {
-                    if (otherPod != pod)
+                    foreach (Pod otherPod in mPods)
                     {
-                        //Add a check to make sure they're not already assigned to the same skein
-                        bool canSkip = false;
-                        /*if (pod.inSkein && otherPod.inSkein)
+                        if (!otherPod.onFinalApproach && otherPod.Velocity.Length() > 0.00001f)
                         {
-                            if (pod.Skein == otherPod.Skein)
+                            if (otherPod != pod)
                             {
-                                canSkip = true;
-                            }
-                        }*/
-                        if (!canSkip)
-                        {
-                            //Distance Check
-                            if ((otherPod.Position - pod.Position).Length() < 50)
-                            {
-                                //Similar Route Check (order of this and distance check could be changed)                  
-                                float angle = angleBetweenVectors(pod.CurrentVector, otherPod.CurrentVector); //possibly check if they are in skein and if so use current skein vector
-
-                                if ((angle < 0.261799 && angle > 0) || (angle > 6.02139 && angle < 6.28319))
-                                //if ((angle < 1 && angle > 0) || (angle > 5 && angle < 6.28319))
+                                //Maybe ddd a check to make sure they're not already assigned to the same skein     
+                                //Distance Check
+                                if ((otherPod.Position - pod.Position).Length() < 30)
                                 {
-                                    //Assign pods to be in a skein
-                                    if (!pod.inSkein && !otherPod.inSkein)
+                                    //Similar Route Check (order of this and distance check could be changed)                  
+                                    float angle = angleBetweenVectors(pod.CurrentVector, otherPod.CurrentVector); //possibly check if they are in skein and if so use current skein vector
+                                    if ((angle < 0.261799 && angle > 0) || (angle > 6.02139 && angle < 6.28319))
+                                    //if ((angle < 1 && angle > 0) || (angle > 5 && angle < 6.28319))
                                     {
-                                        pod.inSkein = true;
-                                        pod.inFormation = false;
-                                        otherPod.inSkein = true;
-                                        otherPod.inFormation = false;
-                                        pod.isLeader = true;
-                                        pod.Skein = new Skein(pod, otherPod);
-                                        otherPod.Skein = pod.Skein;
-                                    }
-                                    else if (!pod.inSkein && otherPod.inSkein)
-                                    {
-                                        otherPod.Skein.Members.Add((pod));
-                                        pod.Skein = otherPod.Skein;
-                                        pod.inFormation = false;
-                                    }
-                                    else if (pod.inSkein && !otherPod.inSkein)
-                                    {
-                                        pod.Skein.Members.Add((otherPod));
-                                        otherPod.Skein = pod.Skein;
-                                        otherPod.inFormation = false;
-                                    }
-                                    else //both currently in Skeins, thus they need to merge (toying with a few ideas here, going to think about it for a bit)
-                                    {
+                                        //Assign pods to be in a skein
+                                        if (!pod.inSkein && !otherPod.inSkein)
+                                        {
+                                            pod.inSkein = true;
+                                            pod.inFormation = false;
+                                            otherPod.inSkein = true;
+                                            otherPod.inFormation = false;
+                                            pod.isLeader = true;
+                                            pod.Skein = new Skein(pod, otherPod);
+                                            otherPod.Skein = pod.Skein;
+                                        }
+                                        else if (!pod.inSkein && otherPod.inSkein)
+                                        {
+                                            otherPod.Skein.Members.Add((pod));
+                                            pod.inSkein = true;
+                                            pod.Skein = otherPod.Skein;
+                                            pod.inFormation = false;
+                                        }
+                                        else if (pod.inSkein && !otherPod.inSkein)
+                                        {
+                                            pod.Skein.Members.Add((otherPod));
+                                            otherPod.inSkein = true;
+                                            otherPod.Skein = pod.Skein;
+                                            otherPod.inFormation = false;
+                                        }
+                                        else //both currently in Skeins, thus they need to merge (toying with a few ideas here, going to think about it for a bit)
+                                        {
 
-                                    }
+                                        }
 
-                                    //Assign Skein leader
+                                        //Assign Skein leader
+                                    }
                                 }
                             }
                         }
@@ -168,8 +168,8 @@ namespace RoutingPrototype
 
         float angleBetweenVectors(Vector2 a, Vector2 b)
         {
-            a.Normalize();
-            b.Normalize();
+            a = a / a.Length();
+            b = b / b.Length();
             return (float)Math.Acos(Vector2.Dot(a, b));
         }
     }

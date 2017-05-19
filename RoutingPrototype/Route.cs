@@ -87,9 +87,9 @@ namespace RoutingPrototype
         public void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Begin();
-            drawLine(spriteBatch);
-            spriteBatch.Draw(mPickUpEntity.Texture, mPickUpEntity.Rect, mPickUpEntity.currentColor());
-            spriteBatch.Draw(mDropOffEntity.Texture, mDropOffEntity.Rect, mDropOffEntity.currentColor());
+            //drawLine(spriteBatch);
+            //spriteBatch.Draw(mPickUpEntity.Texture, mPickUpEntity.Rect, mPickUpEntity.currentColor());
+            //spriteBatch.Draw(mDropOffEntity.Texture, mDropOffEntity.Rect, mDropOffEntity.currentColor());
             spriteBatch.End();
         }
 

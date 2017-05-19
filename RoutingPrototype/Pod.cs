@@ -22,24 +22,30 @@ namespace RoutingPrototype
 
         Color mColor = Color.White;
 
+        float mColorSwitchInterval = 0.1f;
+        float mColorswitchTimer = 0;
+
         Vector2 mTarget; //This is where the pod is directly aiming to go at any given moment
 
         Vector2 mGoal; // This is where the pod actually wants to end up (for example the goal would be the city the pod wants to go to while the target may be the point it is going to meet other pods)
 
         Vector2 mCurrentVector;
 
+
         float mEnergy = 100;
         float mMinimumEnergyThreshold = 5;
         float mSufficientChargeThreshold = 95;
         float mRechargeRate = 60;
         bool mRecharging = false;
-        float distanceScaler = 0.25f;
+        float mDistanceScaler = 0.25f;
         float maxDistance;
+        float mSkeinBonusMultiplier = 0.88f;
 
         int id;
 
         bool mRecentlyFreed = true;
         bool mGoingToCharge = false;
+        bool mOnFinalApproach = false;
 
         float VELOCITY = 100;
         float mMass = 0.05f;
@@ -56,13 +62,18 @@ namespace RoutingPrototype
             maxVelocity = 1;
             mGoal = initialPosition;
             mCityManager = cityManager;
-            maxDistance = 100 / distanceScaler;
+            maxDistance = 100 / mDistanceScaler;
         }
 
         //This will be abstract in this class, just using this here to make a very quick demonstration
         public void Update(GameTime gameTime)
         {
+            mColorswitchTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
             mCurrentVector = mGoal - Position;
+            if (inSkein)
+            {
+                this.Skein.checkLegalSkein(this);
+            }
             checkStatus();
             movement(gameTime);
             
@@ -75,6 +86,7 @@ namespace RoutingPrototype
                 float distance = distanceTo(mCurrentRoute.PickUp);
                 if (distance <= 2)
                 {
+                    mOnFinalApproach = false;
                     currentStatus = STATUS.DroppingOff;
                     mCurrentRoute.pickUpComplete();
                 }                
@@ -84,11 +96,9 @@ namespace RoutingPrototype
                 float distance = distanceTo(mCurrentRoute.DropOff);
                 if (distance <= 2)
                 {
+                    mOnFinalApproach = false;
                     currentStatus = STATUS.Free;
                     mRecentlyFreed = true;
-                    mInSkein = false;
-                    mInFormation = false;
-                    this.Skein = null;
                     mColor = Color.White;
                 }  
             }
@@ -111,7 +121,7 @@ namespace RoutingPrototype
 
                 }
 
-                if (distanceTo(mGoal) > distanceAvailable() && !mRecharging) //Maybe should be target NOT GOAL
+                if (distanceTo(mGoal) + 15 > distanceAvailable() && !mRecharging) //Maybe should be target NOT GOAL
                 {
                     City chargingPoint = findBestChargingPoint();
                     if (chargingPoint != null)
@@ -126,12 +136,14 @@ namespace RoutingPrototype
             }
             else
             {
-                if (distanceTo(mGoal) < 1)
+                if (distanceTo(mGoal) <= 2)
                 {
+
                     mRecharging = true;
                     mEnergy += (float)gameTime.ElapsedGameTime.TotalSeconds * mRechargeRate;
                     if (mEnergy > 100)
                     {
+                        mOnFinalApproach = false;
                         mEnergy = 100;
                         mGoingToCharge = false;
                         mRecharging = false;
@@ -150,46 +162,37 @@ namespace RoutingPrototype
             { 
                 if (mInSkein && currentStatus != STATUS.Free)
                 {
-                    if ((mGoal - Position).Length() > 50)
-                    {
+                    float angle = angleBetweenVectors((mGoal - Position), this.Skein.getCurrentVector());
+                    //if ((mGoal - Position).Length() > 50 || ((angle < 0.349066 && angle >= 0) ||  (angle > 5.93412 && angle <= 6.28319)))
+                    if ((mGoal - Position).Length() > 50 || ((angle < 0.698132 && angle >= 0) || (angle > 5.58505 && angle <= 6.28319)))
+                    { 
                         if (Vector2.Distance(Position, this.Skein.getCurrentCenter()) > 5)
                         {
-                            //Find meeting point
-                            //Vector2 meetingPoint = findMeetingPoint();
-                            //Console.WriteLine(this.Skein.getCurrentCenter());
-                            Vector2 meetingVector = Normalize((this.Skein.getCurrentCenter() - Position));
-                            //Console.WriteLine("toCenter: " + Normalize(meetingVector));
-                            meetingVector += Normalize(mGoal - Position);
-                            //Console.WriteLine("toGoal: " + Normalize(mGoal - Position));
-                            //Console.WriteLine("Overall: " + meetingVector);
-                            mColor = Color.Yellow;
+                            colorYellow();
                             mInFormation = false;
-                            //Console.WriteLine("PreMeetingVector" + id + ": " + meetingVector);
+                            //Find meeting point
+                            Vector2 meetingVector = (Normalize((this.Skein.getCurrentCenter() - Position))) * 1.1f;
+                            meetingVector += (Normalize(mGoal - Position));
                             meetingVector *= Vector2.Distance(mGoal, Position);
-                            mTarget = meetingVector + Position;
-                            //mTarget *= Vector2.Distance(mGoal, Position);
-                            //Console.WriteLine("PosMeetingVector" + id +": " + meetingVector);
-                            //Console.WriteLine("Target" + id + ": " + mTarget);
-                            //Console.WriteLine("Length: " + mTarget.Length());         
+                            mTarget = meetingVector + Position;       
                         }
                         else
                         {
-                            //Console.WriteLine("ASCENION ACHIEVED");
                             mInFormation = true;
-                            mColor = Color.Green;
-                            //Console.WriteLine("SkeinVector" + id + ": " + this.Skein.getCurrentVector());
+                            colorGreen();
                             mTarget = Position + (Normalize(this.Skein.getCurrentVector()) * Vector2.Distance(mGoal, Position));
-                            //Console.WriteLine("Target" + id + ": " + mTarget);
                         }
                     }
                     else
                     {
                         //Leave Skein
+                        mOnFinalApproach = true;
                         this.Skein.remove(this);
                         this.Skein = null;
                         mInSkein = false;
                         mInFormation = false;
                         mColor = Color.White;
+                        mTarget = mGoal;
                     }
                     
                 }
@@ -209,7 +212,14 @@ namespace RoutingPrototype
                 Position = Position + distanceMoved;
                 //Console.WriteLine(Position);
                 //Deduct energy based on distance moved (going to need to scale things to be appropriate to actual map)
-                mEnergy -= distanceMoved.Length() * distanceScaler;
+                if (!inFormation)
+                {
+                    mEnergy -= distanceMoved.Length() * mDistanceScaler;
+                }
+                else
+                {
+                    mEnergy -= distanceMoved.Length() * mDistanceScaler * mSkeinBonusMultiplier;
+                }
                 if (mEnergy < 0)
                     mEnergy = 0;
             }
@@ -244,11 +254,12 @@ namespace RoutingPrototype
             inFormation = false;
             this.Skein = null;
             mColor = Color.White;
+            mTarget = mGoal;
         }
 
         float distanceAvailable()
         {
-            return mEnergy / distanceScaler;
+            return mEnergy / mDistanceScaler;
         }
 
         float distanceTo(Vector2 loc)
@@ -351,6 +362,36 @@ namespace RoutingPrototype
         {
             mCurrentRoute = newRoute;
             currentStatus = STATUS.PickingUp;
+        }
+
+        public bool onFinalApproach
+        {
+            get { return mOnFinalApproach; }
+        }
+
+        void colorGreen()
+        {
+            if (mColorswitchTimer > mColorSwitchInterval)
+            {
+                mColor = Color.Green;
+                mColorswitchTimer = 0;
+            }
+        }
+
+        void colorYellow()
+        {
+            if (mColorswitchTimer > mColorSwitchInterval)
+            {
+                mColor = Color.Yellow;
+                mColorswitchTimer = 0;
+            }
+        }
+
+        float angleBetweenVectors(Vector2 a, Vector2 b)
+        {
+            a = a / a.Length();
+            b = b / b.Length();
+            return (float)Math.Acos(Vector2.Dot(a, b));
         }
     }
 }

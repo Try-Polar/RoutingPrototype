@@ -13,7 +13,7 @@ namespace RoutingPrototype
         int mScreenWidth;
         int mScreenHeight;
 
-        float mSpawnInterval = 0.2f;
+        float mSpawnInterval = 0.05f;
         float mSpawnTimer = 0;
 
         List<Route> mUnassignedRoutes;
@@ -35,6 +35,10 @@ namespace RoutingPrototype
             mUnassignedRoutes = new List<Route>();
             mAssignedRoutes = new List<Route>();
             this.cityManager = cityManager;
+            //For testing purposes only---
+            //mUnassignedRoutes.Add(new Route(mMarkerTexture, mLineTexture, new Vector2(615, 488), new Vector2(727, 728)));
+            //mUnassignedRoutes.Add(new Route(mMarkerTexture, mLineTexture, new Vector2(589, 522), new Vector2(727, 728)));
+            //----------------------------
         }
 
         public List<Route> UnassignedRoutes

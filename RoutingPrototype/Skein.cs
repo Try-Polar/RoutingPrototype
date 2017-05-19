@@ -33,6 +33,27 @@ namespace RoutingPrototype
             return (currentVector / mMembers.Count);
         }
 
+        public void checkLegalSkein(Pod pod)
+        {
+            if (mMembers.Count == 1)
+            {
+                mMembers.First().skeinDispersed();
+                //Console.WriteLine("Dispersed Illeagal Skein");
+            }
+            else
+            {
+                for (int i = mMembers.Count - 1; i >= 0; i--)
+                {
+                    //if (angleBetweenVectors(pod.CurrentVector, mMembers[i].CurrentVector) > 0.261799)
+                    if (angleBetweenVectors(pod.CurrentVector, mMembers[i].CurrentVector) > 0.698132)
+                    {
+                        mMembers[i].skeinDispersed();
+                        mMembers.RemoveAt(i);
+                    }
+                }
+            }
+        }
+
         public void remove(Pod pod)
         {
             mMembers.Remove(pod);
@@ -47,6 +68,7 @@ namespace RoutingPrototype
                 else if (mMembers.Count == 1)
                 {
                     mMembers.First().skeinDispersed();
+                    //Console.WriteLine("Skein destroyed");                  
                 }
             }
         }
@@ -70,6 +92,13 @@ namespace RoutingPrototype
                 center += pod.Position;
             }
             return center / mMembers.Count;
+        }
+
+        float angleBetweenVectors(Vector2 a, Vector2 b)
+        {
+            a = a / a.Length();
+            b = b / b.Length();
+            return (float)Math.Acos(Vector2.Dot(a, b));
         }
     }
 }
