@@ -14,12 +14,14 @@ namespace RoutingPrototype
         SpriteBatch spriteBatch;
 
         Texture2D podTexture;
+        Texture2D formationPodTexture;
         Texture2D destinationTexture;
         Texture2D lineTexture; //a 1x1 texture
         Texture2D cityTexture;
         Texture2D background;
         Rectangle backgroundRectangle;
 
+        FormationManager formationManager;
         PodManager podManager;
         RouteManager routeManager;
         CityManager cityManager;
@@ -67,15 +69,18 @@ namespace RoutingPrototype
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             podTexture = Content.Load<Texture2D>("Pod");
+            formationPodTexture = Content.Load<Texture2D>("FormationPod");
             destinationTexture = Content.Load<Texture2D>("Destination");
             lineTexture = Content.Load<Texture2D>("Line");
             cityTexture = Content.Load<Texture2D>("City");
             background = Content.Load<Texture2D>("Background");
             backgroundRectangle = new Rectangle(0, 0, MAP_WIDTH, MAP_HEIGHT);
 
+            formationManager = new FormationManager(formationPodTexture, new Vector2(SCREEN_WIDTH, SCREEN_HEIGHT));
             cityManager = new CityManager(cityTexture, MAP_WIDTH, MAP_HEIGHT);
             routeManager = new RouteManager(destinationTexture, lineTexture, cityManager, MAP_WIDTH, MAP_HEIGHT);
             podManager = new PodManager(podTexture, destinationTexture, routeManager, cityManager.Cities[0].Position);
+
 
             // TODO: use this.Content to load your game content here
         }
@@ -99,8 +104,8 @@ namespace RoutingPrototype
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-
-            podManager.Update(gameTime);
+            formationManager.Update(gameTime);
+            //podManager.Update(gameTime);
             routeManager.Update(gameTime);
 
             //FOR THE PURPOSES OF SETTING UP CITIES ONLY
@@ -129,13 +134,15 @@ namespace RoutingPrototype
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
+            
             spriteBatch.Begin();
             spriteBatch.Draw(background, backgroundRectangle, Color.White);
             spriteBatch.End();
             cityManager.Draw(spriteBatch);
             podManager.Draw(spriteBatch);
             routeManager.Draw(spriteBatch);
-            
+            formationManager.Draw(spriteBatch);
+
 
             base.Draw(gameTime);
         }

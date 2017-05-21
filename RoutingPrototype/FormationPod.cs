@@ -10,22 +10,34 @@ namespace RoutingPrototype
 {
     class FormationPod : MovingEntity, IUpdateDraw
     {
-        Vector2 mLeaderPostion;
+        Vector2 mLeaderPosition;
         Vector2 mOffset;
         int mFormationIndex;
-        float mOffsetSpacing;
+        float mOffsetSpacing = 50;
         float mMass = 0.05f;
-        float VELOCITY = 50;
+        float VELOCITY = 100;
 
-        public FormationPod(Texture2D texture, Vector2 initialPosition, int formationIndex) : base(texture, initialPosition)
+        bool mIsExiting = false;
+
+        public FormationPod(Texture2D texture, Vector2 initialPosition, Vector2 leaderPosition, int formationIndex) : base(texture, initialPosition)
         {
             mFormationIndex = formationIndex;
-            mOffset = calculateOffset();
+            mLeaderPosition = leaderPosition;
+            mOffset = mLeaderPosition + calculateOffset();
+            maxVelocity = 1;
         }
 
         public void Update(GameTime gameTime)
         {
-            Vector2 acceleration = arrive(mOffset) / mMass;
+            Vector2 acceleration = Vector2.Zero;
+            if (!isExiting)
+            {
+                acceleration = arrive(mOffset) / mMass;
+            }
+            else
+            {
+                //Decide some place offscreen to exit too, then Seek to that destination
+            }
             Velocity += acceleration * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             if (Velocity.Length() > maxVelocity)
@@ -34,22 +46,25 @@ namespace RoutingPrototype
             }
 
             Position = Position + (Velocity * (float)gameTime.ElapsedGameTime.TotalSeconds) * VELOCITY;
+            this.updateRectanglePos();
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-
+            spriteBatch.Begin();
+            spriteBatch.Draw(this.Texture, this.Rect, Color.White);
+            spriteBatch.End();
         }
 
         void changeFormationIndex(int newIndex)
         {
             mFormationIndex = newIndex;
-            mOffset = calculateOffset();
+            mOffset = mLeaderPosition + calculateOffset();
         }
 
         Vector2 calculateOffset()
         {
-            Vector2 offset = new Vector2(1, 1);
+            Vector2 offset = new Vector2(1, 1) * mOffsetSpacing;
             //if index is 0 then pod is leader and so does not have any offset
             if (mFormationIndex == 0)
             {
@@ -72,6 +87,18 @@ namespace RoutingPrototype
                 offset *= offsetMultiplier;
             }
             return offset;
+        }
+
+        public int FormationIndex
+        {
+            get { return mFormationIndex; }
+            set { mFormationIndex = value; }
+        }
+
+        public bool isExiting
+        {
+            get { return mIsExiting; }
+            set { mIsExiting = value; }
         }
 
     }
