@@ -12,19 +12,23 @@ namespace RoutingPrototype
     {
         Vector2 mLeaderPosition;
         Vector2 mOffset;
+        Vector2 mExitLocation;
         int mFormationIndex;
-        float mOffsetSpacing = 50;
+        float mOffsetSpacing = 25;
         float mMass = 0.05f;
         float VELOCITY = 100;
+        Random rnd;
 
         bool mIsExiting = false;
 
-        public FormationPod(Texture2D texture, Vector2 initialPosition, Vector2 leaderPosition, int formationIndex) : base(texture, initialPosition)
+        public FormationPod(Texture2D texture, Vector2 initialPosition, Vector2 leaderPosition, int formationIndex, int seed) : base(texture, initialPosition)
         {
             mFormationIndex = formationIndex;
             mLeaderPosition = leaderPosition;
+            mLeaderPosition.Y -= texture.Width / 2;
             mOffset = mLeaderPosition + calculateOffset();
             maxVelocity = 1;
+            rnd = new Random(seed);
         }
 
         public void Update(GameTime gameTime)
@@ -37,6 +41,7 @@ namespace RoutingPrototype
             else
             {
                 //Decide some place offscreen to exit too, then Seek to that destination
+                acceleration = arrive(mExitLocation) / mMass;
             }
             Velocity += acceleration * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
@@ -56,9 +61,9 @@ namespace RoutingPrototype
             spriteBatch.End();
         }
 
-        void changeFormationIndex(int newIndex)
+        public void changeFormationIndex(int indexChange)
         {
-            mFormationIndex = newIndex;
+            mFormationIndex += indexChange;
             mOffset = mLeaderPosition + calculateOffset();
         }
 
@@ -87,6 +92,12 @@ namespace RoutingPrototype
                 offset *= offsetMultiplier;
             }
             return offset;
+        }
+
+        public void setExiting(Vector2 exitLocation)
+        {
+            isExiting = true;
+            mExitLocation = exitLocation;
         }
 
         public int FormationIndex

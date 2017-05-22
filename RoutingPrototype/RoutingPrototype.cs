@@ -26,6 +26,9 @@ namespace RoutingPrototype
         RouteManager routeManager;
         CityManager cityManager;
 
+        KeyboardState newState;
+        KeyboardState oldState;
+
         int SCREEN_WIDTH = 1200;
         int SCREEN_HEIGHT = 900;
         int MAP_WIDTH;
@@ -105,11 +108,12 @@ namespace RoutingPrototype
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
             formationManager.Update(gameTime);
-            //podManager.Update(gameTime);
+            podManager.Update(gameTime);
             routeManager.Update(gameTime);
 
             //FOR THE PURPOSES OF SETTING UP CITIES ONLY
             MouseState mouseState = Mouse.GetState();
+            newState = Keyboard.GetState();
 
             if (mouseState.LeftButton == ButtonState.Pressed)
             {
@@ -124,6 +128,17 @@ namespace RoutingPrototype
                 Console.WriteLine(mousePosition);
             }
 
+            if (newState.IsKeyUp(Keys.P) && oldState.IsKeyDown(Keys.P))
+            {
+                formationManager.addPod();
+            }
+            if (newState.IsKeyUp(Keys.O) && oldState.IsKeyDown(Keys.O))
+            {
+                formationManager.removePod();
+            }
+
+
+            oldState = newState;
             base.Update(gameTime);
         }
 
@@ -134,14 +149,15 @@ namespace RoutingPrototype
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
-            
+
+            formationManager.Draw(spriteBatch);
             spriteBatch.Begin();
             spriteBatch.Draw(background, backgroundRectangle, Color.White);
             spriteBatch.End();
             cityManager.Draw(spriteBatch);
             podManager.Draw(spriteBatch);
             routeManager.Draw(spriteBatch);
-            formationManager.Draw(spriteBatch);
+            
 
 
             base.Draw(gameTime);
