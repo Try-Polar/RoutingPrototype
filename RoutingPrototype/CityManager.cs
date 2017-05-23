@@ -38,7 +38,7 @@ namespace RoutingPrototype
             mCities.Add(new City(cityTexture, new Vector2(538 * mWidthScaler, 299 * mHeightScaler), "Edinburgh", 10));
             mCities.Add(new City(cityTexture, new Vector2(630 * mWidthScaler, 378 * mHeightScaler), "Newcastle", 5));
             mCities.Add(new City(cityTexture, new Vector2(615 * mWidthScaler, 488 * mHeightScaler), "Leeds", 5));
-            mCities.Add(new City(cityTexture, new Vector2(589 * mWidthScaler, 522 * mHeightScaler), "Manchester", 10));
+            //mCities.Add(new City(cityTexture, new Vector2(589 * mWidthScaler, 522 * mHeightScaler), "Manchester", 10));
             mCities.Add(new City(cityTexture, new Vector2(568 * mWidthScaler, 554 * mHeightScaler), "Liverpool", 5));
             mCities.Add(new City(cityTexture, new Vector2(610 * mWidthScaler, 636 * mHeightScaler), "Birmingham", 10));
             mCities.Add(new City(cityTexture, new Vector2(529 * mWidthScaler, 727 * mHeightScaler), "Cardiff", 5));

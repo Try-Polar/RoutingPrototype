@@ -39,7 +39,7 @@ namespace RoutingPrototype
         bool mRecharging = false;
         float mDistanceScaler = 0.25f;
         float maxDistance;
-        float mSkeinBonusMultiplier = 0.88f;
+        float mSkeinBonusMultiplier = 0.85f;
 
         int id;
 
