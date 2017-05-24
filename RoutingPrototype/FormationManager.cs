@@ -80,9 +80,6 @@ namespace RoutingPrototype
                     mFreeIndices.RemoveAt(0);
                     mFormationPods[index] = new FormationPod(mFormationPodTexture, generateEntranceLocation(), mLeaderPosition, formationIndex, rnd.Next());
                 }
-                Console.WriteLine("Add");
-                Console.WriteLine("Even: " + mEvenIndex);
-                Console.WriteLine("Odd: " + mOddIndex);
                 count++;
             }
         }
@@ -107,10 +104,6 @@ namespace RoutingPrototype
                 mFormationPods[index] = null;
                 adjustIndices(formationIndex);
 
-
-                Console.WriteLine("Remove");
-                Console.WriteLine("Even: " + mEvenIndex);
-                Console.WriteLine("Odd: " + mOddIndex);
                 count--;
             }
         }
