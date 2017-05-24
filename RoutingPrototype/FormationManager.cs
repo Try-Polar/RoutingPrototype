@@ -80,6 +80,9 @@ namespace RoutingPrototype
                     mFreeIndices.RemoveAt(0);
                     mFormationPods[index] = new FormationPod(mFormationPodTexture, generateEntranceLocation(), mLeaderPosition, formationIndex, rnd.Next());
                 }
+                Console.WriteLine("Add");
+                Console.WriteLine("Even: " + mEvenIndex);
+                Console.WriteLine("Odd: " + mOddIndex);
                 count++;
             }
         }
@@ -98,14 +101,16 @@ namespace RoutingPrototype
                 mFormationPods[index].setExiting(generateExitLocation());
                 mExitingPods.Add(mFormationPods[index]);
 
-                adjustIndices(mFormationPods[index].FormationIndex);
-
+                int formationIndex = mFormationPods[index].FormationIndex;
+                
                 mFreeIndices.Add(index);
                 mFormationPods[index] = null;
+                adjustIndices(formationIndex);
 
-                //Adjust formation indices of remain pods
-                
 
+                Console.WriteLine("Remove");
+                Console.WriteLine("Even: " + mEvenIndex);
+                Console.WriteLine("Odd: " + mOddIndex);
                 count--;
             }
         }
@@ -131,44 +136,59 @@ namespace RoutingPrototype
         //Adjust the remaining indices, if odd was removed move all later odd indices down by two
         void adjustIndices(int removedIndex)
         {
-            if (removedIndex % 2 == 1)
-            {
-                mOddIndex = 1;
-            }
-            else
-            {
-                mEvenIndex = 0;
-            }
             for (int i = 0; i < mFormationPods.Length; i ++)
             {
                 if ( mFormationPods[i] != null)
                 {
                     if (removedIndex % 2 == 1)
                     {//Odd
-                        if (mFormationPods[i].FormationIndex % 2 == 1 && mFormationPods[i].FormationIndex > removedIndex)
+                        if (mFormationPods[i].FormationIndex % 2 == 1)
                         {
-                            mFormationPods[i].changeFormationIndex(-2);
-                            if (mFormationPods[i].FormationIndex >= mOddIndex)
+                            if (mFormationPods[i].FormationIndex > removedIndex)
                             {
-                                mOddIndex = mFormationPods[i].FormationIndex + 2;
-                            }                            
+                                mFormationPods[i].changeFormationIndex(-2);
+                            }
                         }
                     }
                     else
                     {//Even
-                        if (mFormationPods[i].FormationIndex % 2 == 0 && mFormationPods[i].FormationIndex > removedIndex)
+                        if (mFormationPods[i].FormationIndex % 2 == 0)
                         {
-                            mFormationPods[i].changeFormationIndex(-2);
-                            if (mFormationPods[i].FormationIndex >= mEvenIndex)
+                            if (mFormationPods[i].FormationIndex > removedIndex)
                             {
-                                mEvenIndex = mFormationPods[i].FormationIndex + 2;
+                                mFormationPods[i].changeFormationIndex(-2);
                             }
                         }
                     }
                 }
             }
+            setHighestIndices();
+        }
 
-
+        void setHighestIndices()
+        {
+            mEvenIndex = 0;
+            mOddIndex = 1;
+            for (int i = 0; i < mFormationPods.Length; i++)
+            {
+                if (mFormationPods[i] != null)
+                {
+                    if (mFormationPods[i].FormationIndex % 2 == 1)
+                    {
+                        if (mFormationPods[i].FormationIndex >= mOddIndex)
+                        {
+                            mOddIndex = mFormationPods[i].FormationIndex + 2;
+                        }
+                    }
+                    else
+                    {
+                        if (mFormationPods[i].FormationIndex >= mEvenIndex)
+                        {
+                            mEvenIndex = mFormationPods[i].FormationIndex + 2;
+                        }
+                    }
+                }
+            }
         }
 
         public void Update(GameTime gameTime)
@@ -180,12 +200,20 @@ namespace RoutingPrototype
                     mFormationPods[i].Update(gameTime);
                 }
             }
-
-            foreach (FormationPod fPod in mExitingPods)
+            for (int i = mExitingPods.Count - 1; i >= 0; i--)
             {
-                fPod.Update(gameTime);
+                if (mExitingPods[i].Position.Y > -20)
+                {
+                    mExitingPods[i].Update(gameTime);
+                }
+                else
+                {
+                    mExitingPods.RemoveAt(i);
+                }
             }
         }
+
+
 
         public void Draw(SpriteBatch spriteBatch)
         {
