@@ -49,6 +49,7 @@
     <Compile Include="FormationManager.cs" />
     <Compile Include="FormationPod.cs" />
     <Compile Include="IUpdateDraw.cs" />
+    <Compile Include="MetricManager.cs" />
     <Compile Include="MovingEntity.cs" />
     <Compile Include="Pod.cs" />
     <Compile Include="PodManager.cs" />

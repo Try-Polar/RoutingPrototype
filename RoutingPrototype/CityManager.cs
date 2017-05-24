@@ -33,18 +33,20 @@ namespace RoutingPrototype
 
         void setupCities()
         {
-            mCities.Add(new City(cityTexture, new Vector2(727 * mWidthScaler, 728 * mHeightScaler), "London", 40));
-            mCities.Add(new City(cityTexture, new Vector2(456 * mWidthScaler, 294 * mHeightScaler), "Glasgow", 5));
-            mCities.Add(new City(cityTexture, new Vector2(538 * mWidthScaler, 299 * mHeightScaler), "Edinburgh", 10));
-            mCities.Add(new City(cityTexture, new Vector2(630 * mWidthScaler, 378 * mHeightScaler), "Newcastle", 5));
-            mCities.Add(new City(cityTexture, new Vector2(615 * mWidthScaler, 488 * mHeightScaler), "Leeds", 5));
+            mCities.Add(new City(cityTexture, new Vector2(711 * mWidthScaler, 691 * mHeightScaler), "London", 40));
+            mCities.Add(new City(cityTexture, new Vector2(347 * mWidthScaler, 180 * mHeightScaler), "Glasgow", 5));
+            mCities.Add(new City(cityTexture, new Vector2(400 * mWidthScaler, 123 * mHeightScaler), "Edinburgh", 10));
+            mCities.Add(new City(cityTexture, new Vector2(586 * mWidthScaler, 266 * mHeightScaler), "Newcastle", 5));
+            mCities.Add(new City(cityTexture, new Vector2(590 * mWidthScaler, 387 * mHeightScaler), "Leeds", 5));
             //mCities.Add(new City(cityTexture, new Vector2(589 * mWidthScaler, 522 * mHeightScaler), "Manchester", 10));
-            mCities.Add(new City(cityTexture, new Vector2(568 * mWidthScaler, 554 * mHeightScaler), "Liverpool", 5));
-            mCities.Add(new City(cityTexture, new Vector2(610 * mWidthScaler, 636 * mHeightScaler), "Birmingham", 10));
-            mCities.Add(new City(cityTexture, new Vector2(529 * mWidthScaler, 727 * mHeightScaler), "Cardiff", 5));
-            mCities.Add(new City(cityTexture, new Vector2(559 * mWidthScaler, 749 * mHeightScaler), "Bristol", 5));
-            mCities.Add(new City(cityTexture, new Vector2(350 * mWidthScaler, 546 * mHeightScaler), "Dublin", 5));
-            mCities.Add(new City(cityTexture, new Vector2(827 * mWidthScaler, 518 * mHeightScaler), "FloatingPort", 5));
+            mCities.Add(new City(cityTexture, new Vector2(490 * mWidthScaler, 469 * mHeightScaler), "Liverpool", 5));
+            mCities.Add(new City(cityTexture, new Vector2(559 * mWidthScaler, 541 * mHeightScaler), "Birmingham", 10));
+            mCities.Add(new City(cityTexture, new Vector2(434 * mWidthScaler, 690 * mHeightScaler), "Cardiff", 5));
+            mCities.Add(new City(cityTexture, new Vector2(499 * mWidthScaler, 700 * mHeightScaler), "Bristol", 5));
+            mCities.Add(new City(cityTexture, new Vector2(161 * mWidthScaler, 367 * mHeightScaler), "Dublin", 5));
+            mCities.Add(new City(cityTexture, new Vector2(789 * mWidthScaler, 344 * mHeightScaler), "FloatingPort", 5));
+
+            Console.WriteLine((new Vector2(711, 691) - new Vector2(499, 700)).Length());
 
             //mCities.Add(new City(cityTexture, new Vector2(500 * mWidthScaler, 700 * mHeightScaler), "TestA", 10));
             //mCities.Add(new City(cityTexture, new Vector2(500 * mWidthScaler, 500 * mHeightScaler), "TestB", 10));

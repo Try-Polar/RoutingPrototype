@@ -16,7 +16,7 @@ namespace RoutingPrototype
         Texture2D mPodTexture;
         Texture2D mDestinationTexture;
 
-        int initialNumberOfPods = 100;
+        int initialNumberOfPods = 50;
 
         int currentId = 1;
 
@@ -24,8 +24,11 @@ namespace RoutingPrototype
         Random rnd = new Random();
 
         RouteManager mRouteManager;
+        float mDistMulti;
+        float mTimeMulti;
 
-        public PodManager(Texture2D podText, Texture2D destinationText, RouteManager routeManager, Vector2 startLocation)
+
+        public PodManager(Texture2D podText, Texture2D destinationText, RouteManager routeManager, Vector2 startLocation, float distMulti, float timeMulti)
         {
             mPodTexture = podText;
             mDestinationTexture = destinationText;
@@ -34,6 +37,9 @@ namespace RoutingPrototype
             mFreePods = new List<Pod>();
 
             mRouteManager = routeManager;
+
+            mDistMulti = distMulti;
+            mTimeMulti = timeMulti;
             //For testing purposes only---
             //mPods.Add(new Pod(mPodTexture, mDestinationTexture, new Vector2(615, 488), routeManager.CityManager, rnd.Next(), currentId++));
             //mPods.Add(new Pod(mPodTexture, mDestinationTexture, new Vector2(589, 522), routeManager.CityManager, rnd.Next(), currentId++));
@@ -42,7 +48,7 @@ namespace RoutingPrototype
             //establish some number of pods
             for (int i = 0; i < initialNumberOfPods; i++)
             {
-                mPods.Add(new Pod(mPodTexture, mDestinationTexture, startLocation, routeManager.CityManager, rnd.Next(), currentId++));
+                mPods.Add(new Pod(mPodTexture, mDestinationTexture, startLocation, routeManager.CityManager, rnd.Next(), currentId++, mDistMulti, mTimeMulti));
             }
         }
 
@@ -60,7 +66,7 @@ namespace RoutingPrototype
                             {
                                 //Maybe ddd a check to make sure they're not already assigned to the same skein     
                                 //Distance Check
-                                if ((otherPod.Position - pod.Position).Length() < 30)
+                                if ((otherPod.Position - pod.Position).Length() < 10)
                                 {
                                     //Similar Route Check (order of this and distance check could be changed)                  
                                     float angle = angleBetweenVectors(pod.CurrentVector, otherPod.CurrentVector); //possibly check if they are in skein and if so use current skein vector
@@ -171,6 +177,11 @@ namespace RoutingPrototype
             a = a / a.Length();
             b = b / b.Length();
             return (float)Math.Acos(Vector2.Dot(a, b));
+        }
+
+        public List<Pod> Pods
+        {
+            get { return mPods; }
         }
     }
 }

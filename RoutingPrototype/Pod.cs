@@ -25,6 +25,13 @@ namespace RoutingPrototype
         float mColorSwitchInterval = 0.1f;
         float mColorswitchTimer = 0;
 
+        float mDistTravelledOnJourney;
+        float mMaxDistanceTravelled;
+        float mTotalDistTravelledOnJourney;
+        float mTotalMaxDistanceTravelled;
+
+        public bool newData = false;
+
         Vector2 mTarget; //This is where the pod is directly aiming to go at any given moment
 
         Vector2 mGoal; // This is where the pod actually wants to end up (for example the goal would be the city the pod wants to go to while the target may be the point it is going to meet other pods)
@@ -38,6 +45,7 @@ namespace RoutingPrototype
         float mRechargeRate = 60;
         bool mRecharging = false;
         float mDistanceScaler = 0.25f;
+        float mDistMulti;
         float maxDistance;
         float mSkeinBonusMultiplier = 0.85f;
 
@@ -46,8 +54,9 @@ namespace RoutingPrototype
         bool mRecentlyFreed = true;
         bool mGoingToCharge = false;
         bool mOnFinalApproach = false;
+        bool mJourneyStarted = false;
 
-        float VELOCITY = 100;
+        float VELOCITY;
         float mMass = 0.05f;
 
         CityManager mCityManager;
@@ -55,7 +64,7 @@ namespace RoutingPrototype
         Random rnd;
         STATUS currentStatus = STATUS.Free; //initially Picking up
 
-        public Pod(Texture2D texture, Texture2D markerTexture, Vector2 initialPosition, CityManager cityManager, int randomSeed, int podId) : base(texture, initialPosition)
+        public Pod(Texture2D texture, Texture2D markerTexture, Vector2 initialPosition, CityManager cityManager, int randomSeed, int podId, float distMulti, float timeMulti) : base(texture, initialPosition)
         {
             id = podId;
             rnd = new Random(randomSeed);
@@ -63,6 +72,8 @@ namespace RoutingPrototype
             mGoal = initialPosition;
             mCityManager = cityManager;
             maxDistance = 100 / mDistanceScaler;
+            VELOCITY = 300 * distMulti / timeMulti;
+            mDistMulti = distMulti;
         }
 
         //This will be abstract in this class, just using this here to make a very quick demonstration
@@ -76,7 +87,6 @@ namespace RoutingPrototype
             }
             checkStatus();
             movement(gameTime);
-            
         }
 
         private void checkStatus()
@@ -100,7 +110,22 @@ namespace RoutingPrototype
                     currentStatus = STATUS.Free;
                     mRecentlyFreed = true;
                     mColor = Color.White;
+                    
                 }  
+            }
+            if ((mGoal - Position).Length() < 2)
+            {
+                if (mJourneyStarted)
+                    journeyEnded();
+                mJourneyStarted = false;
+            }
+            else
+            {
+                if (!mJourneyStarted)
+                {
+                    startJourney(mGoal);
+                }
+                mJourneyStarted = true;
             }
         }
 
@@ -112,13 +137,11 @@ namespace RoutingPrototype
                 {
                     mGoal = mCurrentRoute.PickUp;
                     mTarget = mGoal;
-
                 }
                 else if (currentStatus == STATUS.DroppingOff)
                 {
                     mGoal = mCurrentRoute.DropOff;
                     mTarget = mGoal;
-
                 }
 
                 if (distanceTo(mGoal) + 25 > distanceAvailable() && !mRecharging) //Maybe should be target NOT GOAL
@@ -129,7 +152,6 @@ namespace RoutingPrototype
                         mGoingToCharge = true;
                         mRecharging = false;
                         mGoal = chargingPoint.Position;
-
                     }
                 }
                 mTarget = mGoal; //Might seem redundant, to do this right after setting mGoal, but mTarget is likely to change while mGoal will not
@@ -138,7 +160,10 @@ namespace RoutingPrototype
             {
                 if (distanceTo(mGoal) <= 2)
                 {
-
+                    
+                    if (mJourneyStarted)
+                        journeyEnded();
+                    mJourneyStarted = false;
                     mRecharging = true;
                     mEnergy += (float)gameTime.ElapsedGameTime.TotalSeconds * mRechargeRate;
                     if (mEnergy > 100)
@@ -215,10 +240,12 @@ namespace RoutingPrototype
                 if (!inFormation)
                 {
                     mEnergy -= distanceMoved.Length() * mDistanceScaler;
+                    mDistTravelledOnJourney += distanceMoved.Length();
                 }
                 else
                 {
                     mEnergy -= distanceMoved.Length() * mDistanceScaler * mSkeinBonusMultiplier;
+                    mDistTravelledOnJourney += distanceMoved.Length() * mSkeinBonusMultiplier;
                 }
                 if (mEnergy < 0)
                     mEnergy = 0;
@@ -310,6 +337,20 @@ namespace RoutingPrototype
             return center + (Normalize(this.Skein.getCurrentVector()) * Vector2.Distance(Position, center));
         }
 
+        void startJourney(Vector2 endPoint)
+        {
+
+            mDistTravelledOnJourney = 0;
+            mMaxDistanceTravelled = (endPoint - Position).Length();
+        }
+
+        void journeyEnded()
+        {
+            newData = true;
+            //mTotalDistTravelledOnJourney = mDistTravelledOnJourney * mDistMulti;
+            //mTotalMaxDistanceTravelled = mMaxDistanceTravelled * mDistMulti;
+        }
+
         public void Draw(SpriteBatch spriteBatch)
         {
 
@@ -351,6 +392,16 @@ namespace RoutingPrototype
         public Vector2 CurrentVector
         {   
             get { return mCurrentVector; }
+        }
+
+        public float ActualDistanceTravelled
+        {
+            get { return mDistTravelledOnJourney; }
+        }
+
+        public float NonSkeinDistanceTravelled
+        {
+            get { return mMaxDistanceTravelled; }
         }
 
         public void clearRoute()

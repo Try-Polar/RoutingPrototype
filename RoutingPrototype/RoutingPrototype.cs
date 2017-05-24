@@ -25,6 +25,7 @@ namespace RoutingPrototype
         PodManager podManager;
         RouteManager routeManager;
         CityManager cityManager;
+        MetricManager metricManager;
 
         KeyboardState newState;
         KeyboardState oldState;
@@ -36,6 +37,9 @@ namespace RoutingPrototype
 
         //FOR CREATION PURPOSES
         bool mouseJustPressed = false;
+
+        float kilometerToPixelMultiplier; //Based on distance from london to bristol
+        float hourToSecondMultiplier; //1 minute of real time is one day of simulation time
 
         public RoutingPrototype()
         {
@@ -54,6 +58,9 @@ namespace RoutingPrototype
             MAP_WIDTH = (int)(0.75f * SCREEN_WIDTH);
             MAP_HEIGHT = SCREEN_HEIGHT;
 
+            kilometerToPixelMultiplier = (float)((212.1909 * (SCREEN_WIDTH / 1200)) / 172);
+            hourToSecondMultiplier = (60 / 24);
+
             this.IsMouseVisible = true;
 
             graphics.PreferredBackBufferWidth = SCREEN_WIDTH;
@@ -68,6 +75,7 @@ namespace RoutingPrototype
         /// </summary>
         protected override void LoadContent()
         {
+            
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
@@ -76,14 +84,14 @@ namespace RoutingPrototype
             destinationTexture = Content.Load<Texture2D>("Destination");
             lineTexture = Content.Load<Texture2D>("Line");
             cityTexture = Content.Load<Texture2D>("City");
-            background = Content.Load<Texture2D>("Background");
+            background = Content.Load<Texture2D>("BackgroundRescaled");
             backgroundRectangle = new Rectangle(0, 0, MAP_WIDTH, MAP_HEIGHT);
 
             formationManager = new FormationManager(formationPodTexture, new Vector2(SCREEN_WIDTH, SCREEN_HEIGHT));
             cityManager = new CityManager(cityTexture, MAP_WIDTH, MAP_HEIGHT);
             routeManager = new RouteManager(destinationTexture, lineTexture, cityManager, MAP_WIDTH, MAP_HEIGHT);
-            podManager = new PodManager(podTexture, destinationTexture, routeManager, cityManager.Cities[0].Position);
-
+            podManager = new PodManager(podTexture, destinationTexture, routeManager, cityManager.Cities[0].Position, kilometerToPixelMultiplier, hourToSecondMultiplier);
+            metricManager = new MetricManager(podManager);
 
             // TODO: use this.Content to load your game content here
         }
@@ -110,6 +118,7 @@ namespace RoutingPrototype
             formationManager.Update(gameTime);
             podManager.Update(gameTime);
             routeManager.Update(gameTime);
+            metricManager.Update(gameTime);
 
             //FOR THE PURPOSES OF SETTING UP CITIES ONLY
             MouseState mouseState = Mouse.GetState();
