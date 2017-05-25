@@ -12,11 +12,14 @@ namespace RoutingPrototype
     {
         float kilometersSavedBySkeins = 0;
 
+        float mPixelToKilometerConverter;
+
         PodManager mPodManager;
 
-        public MetricManager(PodManager podManager)
+        public MetricManager(PodManager podManager, float pixelReference, float kilometerReference)
         {
             mPodManager = podManager;
+            mPixelToKilometerConverter = pixelReference / kilometerReference;
         }
 
         public void Update(GameTime gameTime)
@@ -26,11 +29,11 @@ namespace RoutingPrototype
             {
                 if (pod.newData)
                 {
-                    kilometersSavedBySkeins += (pod.NonSkeinDistanceTravelled - pod.ActualDistanceTravelled - 1.5f); //Seems to misjudge a little so -1 essentially corrects this
+                    kilometersSavedBySkeins += (pod.NonSkeinDistanceTravelled - pod.ActualDistanceTravelled - 1.5f) * mPixelToKilometerConverter; //Seems to misjudge a little so -1 essentially corrects this
                     pod.newData = false;
                 }
             }
-            Console.WriteLine(kilometersSavedBySkeins);
+            //Console.WriteLine(kilometersSavedBySkeins);
         }
 
         public void Draw(SpriteBatch spritebatch)

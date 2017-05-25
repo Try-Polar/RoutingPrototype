@@ -45,10 +45,14 @@
     <Compile Include="BaseEntity.cs" />
     <Compile Include="City.cs" />
     <Compile Include="CityManager.cs" />
+    <Compile Include="CityPod.cs" />
+    <Compile Include="CityPodManager.cs" />
+    <Compile Include="CollaboratingCity.cs" />
     <Compile Include="DestinationMarker.cs" />
     <Compile Include="FormationManager.cs" />
     <Compile Include="FormationPod.cs" />
     <Compile Include="IUpdateDraw.cs" />
+    <Compile Include="LandingZone.cs" />
     <Compile Include="MetricManager.cs" />
     <Compile Include="MovingEntity.cs" />
     <Compile Include="Pod.cs" />

@@ -46,7 +46,7 @@ namespace RoutingPrototype
             mCities.Add(new City(cityTexture, new Vector2(161 * mWidthScaler, 367 * mHeightScaler), "Dublin", 5));
             mCities.Add(new City(cityTexture, new Vector2(789 * mWidthScaler, 344 * mHeightScaler), "FloatingPort", 5));
 
-            Console.WriteLine((new Vector2(711, 691) - new Vector2(499, 700)).Length());
+            //Console.WriteLine((new Vector2(711, 691) - new Vector2(499, 700)).Length());
 
             //mCities.Add(new City(cityTexture, new Vector2(500 * mWidthScaler, 700 * mHeightScaler), "TestA", 10));
             //mCities.Add(new City(cityTexture, new Vector2(500 * mWidthScaler, 500 * mHeightScaler), "TestB", 10));

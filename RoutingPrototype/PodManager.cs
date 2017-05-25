@@ -66,7 +66,7 @@ namespace RoutingPrototype
                             {
                                 //Maybe ddd a check to make sure they're not already assigned to the same skein     
                                 //Distance Check
-                                if ((otherPod.Position - pod.Position).Length() < 10)
+                                if ((otherPod.Position - pod.Position).Length() < 20)
                                 {
                                     //Similar Route Check (order of this and distance check could be changed)                  
                                     float angle = angleBetweenVectors(pod.CurrentVector, otherPod.CurrentVector); //possibly check if they are in skein and if so use current skein vector
