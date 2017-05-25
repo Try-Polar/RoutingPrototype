@@ -121,7 +121,7 @@ namespace RoutingPrototype
 
                 }
 
-                if (distanceTo(mGoal) + 15 > distanceAvailable() && !mRecharging) //Maybe should be target NOT GOAL
+                if (distanceTo(mGoal) + 25 > distanceAvailable() && !mRecharging) //Maybe should be target NOT GOAL
                 {
                     City chargingPoint = findBestChargingPoint();
                     if (chargingPoint != null)
