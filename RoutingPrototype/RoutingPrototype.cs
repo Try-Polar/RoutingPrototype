@@ -93,10 +93,11 @@ namespace RoutingPrototype
             formationManager = new FormationManager(formationPodTexture, new Vector2(SCREEN_WIDTH, SCREEN_HEIGHT));
             cityManager = new CityManager(cityTexture, MAP_WIDTH, MAP_HEIGHT);
             routeManager = new RouteManager(destinationTexture, lineTexture, cityManager, MAP_WIDTH, MAP_HEIGHT);
-            podManager = new PodManager(podTexture, destinationTexture, routeManager, cityManager.Cities[0].Position, kilometerToPixelMultiplier, hourToSecondMultiplier);
+            cityPodManager = new CityPodManager(podTexture, SCREEN_WIDTH, SCREEN_HEIGHT, new Vector2(1050, SCREEN_HEIGHT / 2), cityTexture);
+            podManager = new PodManager(podTexture, destinationTexture, routeManager, cityManager.Cities[0].Position, kilometerToPixelMultiplier, hourToSecondMultiplier, cityPodManager);
             metricManager = new MetricManager(podManager, UKpixelReference, UKKilometerReference);
             //cityPodManager = new CityPodManager(podTexture, SCREEN_WIDTH, new Vector2(SCREEN_WIDTH * (7 / 8), SCREEN_HEIGHT / 2), cityTexture);
-            cityPodManager = new CityPodManager(podTexture, SCREEN_WIDTH, new Vector2(1050, SCREEN_HEIGHT / 2), cityTexture);
+            
 
             // TODO: use this.Content to load your game content here
         }

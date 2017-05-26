@@ -21,13 +21,15 @@ namespace RoutingPrototype
         Vector2 mTakeOffTarget;
         Vector2 mExitPoint;
 
+        Pod mPod;
+
         float mMass = 0.05f;
         float VELOCITY = 50;
         int mCityRadius;
 
         Vector2 mTarget;
 
-        public CityPod(Texture2D texture, Vector2 pos, float screenWidth, Vector2 cityCenter, Vector2 takeOffDirection, int rndX, int rndY) : base (texture, pos)
+        public CityPod(Texture2D texture, Vector2 pos, float screenWidth, Vector2 cityCenter, Vector2 takeOffDirection, int rndX, int rndY, Pod pod) : base (texture, pos)
         {
             mCityRadius = (int)screenWidth / 12;
             mCityCenter = cityCenter;
@@ -38,6 +40,7 @@ namespace RoutingPrototype
             mExitPoint = mCityCenter + (takeOffDirection * mCityRadius * 2);
             maxVelocity = 1;
             mTarget = mCityCenter;
+            mPod = pod;
         }
 
         public void Update(GameTime gameTime)
@@ -69,6 +72,7 @@ namespace RoutingPrototype
                 mCurrentStatus = STATUS.takingOff;
                 mTarget = mExitPoint;
             }
+            //If left city sim area delete city pod and free up pod in large sim
         }
 
         void movement(GameTime gameTime)
@@ -100,6 +104,11 @@ namespace RoutingPrototype
             spriteBatch.Begin();
             spriteBatch.Draw(Texture, Rect, Color.White);
             spriteBatch.End();
+        }
+
+        public Pod Pod
+        {
+            get { return mPod; }
         }
     }
 }

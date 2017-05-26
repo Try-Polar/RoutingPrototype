@@ -13,32 +13,68 @@ namespace RoutingPrototype
         List<CityPod> mPods;
         Texture2D mPodTexture;
         int mScreenWidth;
+        int mScreenHeight;
+        int mLeftBoundary;
+        int mUpperBoundary;
+        int mLowerBoundary;
         CollaboratingCity mCity;
+        Random rnd;
 
-        public CityPodManager(Texture2D podTexture, int screenWidth, Vector2 cityPosition, Texture2D cityTexture )
+        public CityPodManager(Texture2D podTexture, int screenWidth, int screenHeight, Vector2 cityPosition, Texture2D cityTexture )
         {
             mPods = new List<CityPod>();
             mPodTexture = podTexture;
             mScreenWidth = screenWidth;
+            mScreenHeight = screenHeight;
             mCity = new CollaboratingCity(cityTexture, cityPosition);
-            //TESTING ONLY
-            mPods.Add(new CityPod(mPodTexture, new Vector2(780, 400), mScreenWidth, mCity.Position, new Vector2(1, 1), 10, -5));
+            mLeftBoundary = (int)(0.75f * mScreenWidth);
+            mUpperBoundary = (int)(0.3333f * mScreenHeight);
+            mLowerBoundary = (int)(0.6666f * mScreenHeight);
+            rnd = new Random();
+        }
+
+        public void AddPod(Pod pod)
+        {
+            mPods.Add(new CityPod(mPodTexture, new Vector2(mLeftBoundary + 10, mUpperBoundary + 10), mScreenWidth, mCity.Position, new Vector2(rnd.Next(-5, 5), rnd.Next(-5, 5)), rnd.Next(-5,5), rnd.Next(-5, 5), pod));
         }
 
         public void Update(GameTime gameTime)
         {
-            foreach (CityPod pod in mPods)
+            for (int i = mPods.Count-1; i > -1; i--)
             {
-                pod.Update(gameTime);
+                if (inCityArea(mPods[i].Position))
+                {
+                    mPods[i].Update(gameTime);
+                }
+                else
+                {
+                    mPods[i].Pod.leftCity();
+                    mPods.RemoveAt(i);
+                }
             }
+        }
+
+        bool inCityArea(Vector2 pos)
+        {
+            if (pos.X > mLeftBoundary && pos.X < mScreenWidth)
+            {
+                if (pos.Y > mUpperBoundary && pos.Y < mLowerBoundary)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
             mCity.Draw(spriteBatch);
-            foreach (CityPod pod in mPods)
+            foreach (CityPod cityPod in mPods)
             {
-                pod.Draw(spriteBatch);
+                if (cityPod.Pod.InLondon == true && inCityArea(cityPod.Position))
+                {
+                    cityPod.Draw(spriteBatch);
+                }
             }
         }
     }

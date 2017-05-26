@@ -64,6 +64,18 @@ namespace RoutingPrototype
             return total;
         }
 
+        public Vector2 findLondon()
+        {
+            foreach (City city in mCities)
+            {
+                if (city.Name == "London")
+                {
+                    return city.Position;
+                }
+            }
+            return Vector2.Zero;
+        }
+
         public List<City> Cities
         {
             get { return mCities; }

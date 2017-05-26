@@ -24,11 +24,12 @@ namespace RoutingPrototype
         Random rnd = new Random();
 
         RouteManager mRouteManager;
+        CityPodManager mCityPodManger;
         float mDistMulti;
         float mTimeMulti;
 
 
-        public PodManager(Texture2D podText, Texture2D destinationText, RouteManager routeManager, Vector2 startLocation, float distMulti, float timeMulti)
+        public PodManager(Texture2D podText, Texture2D destinationText, RouteManager routeManager, Vector2 startLocation, float distMulti, float timeMulti, CityPodManager cityPodManager)
         {
             mPodTexture = podText;
             mDestinationTexture = destinationText;
@@ -37,6 +38,7 @@ namespace RoutingPrototype
             mFreePods = new List<Pod>();
 
             mRouteManager = routeManager;
+            mCityPodManger = cityPodManager;
 
             mDistMulti = distMulti;
             mTimeMulti = timeMulti;
@@ -48,7 +50,7 @@ namespace RoutingPrototype
             //establish some number of pods
             for (int i = 0; i < initialNumberOfPods; i++)
             {
-                mPods.Add(new Pod(mPodTexture, mDestinationTexture, startLocation, routeManager.CityManager, rnd.Next(), currentId++, mDistMulti, mTimeMulti));
+                mPods.Add(new Pod(mPodTexture, mDestinationTexture, startLocation, routeManager.CityManager, rnd.Next(), currentId++, mDistMulti, mTimeMulti, cityPodManager));
             }
         }
 

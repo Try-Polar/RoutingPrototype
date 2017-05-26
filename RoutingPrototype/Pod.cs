@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-enum STATUS {  PickingUp, DroppingOff, Free, GoingToCharge} //might have more statuses later
+enum STATUS {  PickingUp, DroppingOff, Free, GoingToCharge, inCity} //might have more statuses later
 
 namespace RoutingPrototype
 {
@@ -17,6 +17,7 @@ namespace RoutingPrototype
         bool mInSkein = false;
         bool mIsLeader = false;
         bool mInFormation = false;
+        bool mInLondon = false;
 
         public Skein Skein;
 
@@ -48,6 +49,7 @@ namespace RoutingPrototype
         float mDistMulti;
         float maxDistance;
         float mSkeinBonusMultiplier = 0.85f;
+        float mChangeToLandInCity = 0.5f;
 
         int id;
 
@@ -60,20 +62,24 @@ namespace RoutingPrototype
         float mMass = 0.05f;
 
         CityManager mCityManager;
+        CityPodManager mCityPodManager;
+        Vector2 mLondonLocation;
 
         Random rnd;
         STATUS currentStatus = STATUS.Free; //initially Picking up
 
-        public Pod(Texture2D texture, Texture2D markerTexture, Vector2 initialPosition, CityManager cityManager, int randomSeed, int podId, float distMulti, float timeMulti) : base(texture, initialPosition)
+        public Pod(Texture2D texture, Texture2D markerTexture, Vector2 initialPosition, CityManager cityManager, int randomSeed, int podId, float distMulti, float timeMulti, CityPodManager cityPodManager) : base(texture, initialPosition)
         {
             id = podId;
             rnd = new Random(randomSeed);
             maxVelocity = 1;
             mGoal = initialPosition;
             mCityManager = cityManager;
+            mCityPodManager = cityPodManager;
             maxDistance = 100 / mDistanceScaler;
             VELOCITY = 300 * distMulti / timeMulti;
             mDistMulti = distMulti;
+            mLondonLocation = cityManager.findLondon();
         }
 
         //This will be abstract in this class, just using this here to make a very quick demonstration
@@ -110,7 +116,22 @@ namespace RoutingPrototype
                     currentStatus = STATUS.Free;
                     mRecentlyFreed = true;
                     mColor = Color.White;
-                    
+                    if (rnd.NextDouble() < mChangeToLandInCity)
+                    {
+                        Console.WriteLine("Landing");
+                        //"Land" in city
+                        currentStatus = STATUS.inCity;
+                        if (Vector2.Distance(Position, mLondonLocation) < 2)
+                        {
+                            mInLondon = true;
+                        }
+                        else
+                        {
+                            mInLondon = false;
+                        }
+                        mCityPodManager.AddPod(this);
+                        mColor = Color.Blue;
+                    }
                 }  
             }
             if ((mGoal - Position).Length() < 2)
@@ -131,6 +152,10 @@ namespace RoutingPrototype
 
         private void movement(GameTime gameTime)
         {
+            if (currentStatus == STATUS.inCity)
+            {
+                return;
+            }
             if (!mGoingToCharge)
             {
                 if (currentStatus == STATUS.PickingUp)
@@ -372,6 +397,11 @@ namespace RoutingPrototype
             set { mInSkein = value; }
         }
 
+        public bool InLondon
+        {
+            get { return mInLondon; }
+        }
+
         public bool isLeader
         {
             get { return mIsLeader; }
@@ -413,6 +443,13 @@ namespace RoutingPrototype
         {
             mCurrentRoute = newRoute;
             currentStatus = STATUS.PickingUp;
+        }
+
+        public void leftCity()
+        {
+            currentStatus = STATUS.Free;
+            mColor = Color.White;
+            Console.WriteLine("LeavingCity");
         }
 
         public bool onFinalApproach
