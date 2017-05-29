@@ -28,8 +28,6 @@ namespace RoutingPrototype
 
         float mDistTravelledOnJourney;
         float mMaxDistanceTravelled;
-        float mTotalDistTravelledOnJourney;
-        float mTotalMaxDistanceTravelled;
 
         public bool newData = false;
 
@@ -49,7 +47,7 @@ namespace RoutingPrototype
         float mDistMulti;
         float maxDistance;
         float mSkeinBonusMultiplier = 0.85f;
-        float mChangeToLandInCity = 0.5f;
+        float mChanceToLandInCity = 0.05f;
 
         int id;
 
@@ -66,7 +64,7 @@ namespace RoutingPrototype
         Vector2 mLondonLocation;
 
         Random rnd;
-        STATUS currentStatus = STATUS.Free; //initially Picking up
+        STATUS currentStatus = STATUS.Free;
 
         public Pod(Texture2D texture, Texture2D markerTexture, Vector2 initialPosition, CityManager cityManager, int randomSeed, int podId, float distMulti, float timeMulti, CityPodManager cityPodManager) : base(texture, initialPosition)
         {
@@ -116,9 +114,9 @@ namespace RoutingPrototype
                     currentStatus = STATUS.Free;
                     mRecentlyFreed = true;
                     mColor = Color.White;
-                    if (rnd.NextDouble() < mChangeToLandInCity)
+                    if (rnd.NextDouble() < mChanceToLandInCity)
                     {
-                        Console.WriteLine("Landing");
+                        Console.WriteLine(id + "Landing");
                         //"Land" in city
                         currentStatus = STATUS.inCity;
                         if (Vector2.Distance(Position, mLondonLocation) < 2)
@@ -300,6 +298,15 @@ namespace RoutingPrototype
             }
         }
 
+        public bool isInCity()
+        {
+            if (currentStatus == STATUS.inCity)
+            {
+                return true;
+            }
+            return false;
+        }
+
         public void skeinDispersed()
         {
             inSkein = false;
@@ -449,7 +456,8 @@ namespace RoutingPrototype
         {
             currentStatus = STATUS.Free;
             mColor = Color.White;
-            Console.WriteLine("LeavingCity");
+            mTarget = mGoal;
+            Console.WriteLine(id + "LeavingCity");
         }
 
         public bool onFinalApproach
