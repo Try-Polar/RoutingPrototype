@@ -16,7 +16,7 @@ namespace RoutingPrototype
         Texture2D mPodTexture;
         Texture2D mDestinationTexture;
 
-        int initialNumberOfPods = 50;
+        int initialNumberOfPods = 10;
 
         int currentId = 1;
 

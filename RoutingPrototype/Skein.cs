@@ -52,6 +52,10 @@ namespace RoutingPrototype
                     }
                 }
             }
+            if (pod.isInCity() && mMembers.Contains(pod))
+            {
+                mMembers.Remove(pod);
+            }
         }
 
         public void remove(Pod pod)

@@ -66,7 +66,7 @@ namespace RoutingPrototype
         Vector2 mLondonLocation;
 
         Random rnd;
-        STATUS currentStatus = STATUS.Free; //initially Picking up
+        STATUS currentStatus = STATUS.Free;
 
         public Pod(Texture2D texture, Texture2D markerTexture, Vector2 initialPosition, CityManager cityManager, int randomSeed, int podId, float distMulti, float timeMulti, CityPodManager cityPodManager) : base(texture, initialPosition)
         {
@@ -298,6 +298,15 @@ namespace RoutingPrototype
             {
                 return false;
             }
+        }
+
+        public bool isInCity()
+        {
+            if (currentStatus == STATUS.inCity)
+            {
+                return true;
+            }
+            return false;
         }
 
         public void skeinDispersed()
