@@ -16,7 +16,7 @@ namespace RoutingPrototype
         Texture2D mPodTexture;
         Texture2D mDestinationTexture;
 
-        int initialNumberOfPods = 10;
+        int initialNumberOfPods = 50;
 
         int currentId = 1;
 
@@ -58,11 +58,11 @@ namespace RoutingPrototype
         {
             foreach (Pod pod in mPods)
             {
-                if (!pod.onFinalApproach && pod.Velocity.Length() > 0.00001f)
+                if (!pod.onFinalApproach && pod.Velocity.Length() > 0.00001f && !pod.isInCity())
                 {
                     foreach (Pod otherPod in mPods)
                     {
-                        if (!otherPod.onFinalApproach && otherPod.Velocity.Length() > 0.00001f)
+                        if (!otherPod.onFinalApproach && otherPod.Velocity.Length() > 0.00001f && !otherPod.isInCity())
                         {
                             if (otherPod != pod)
                             {
@@ -75,6 +75,7 @@ namespace RoutingPrototype
                                     if ((angle < 0.261799 && angle > 0) || (angle > 6.02139 && angle < 6.28319))
                                     //if ((angle < 1 && angle > 0) || (angle > 5 && angle < 6.28319))
                                     {
+                                        //Console.WriteLine(pod.Position)
                                         //Assign pods to be in a skein
                                         if (!pod.inSkein && !otherPod.inSkein)
                                         {
