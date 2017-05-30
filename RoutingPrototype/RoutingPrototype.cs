@@ -31,6 +31,8 @@ namespace RoutingPrototype
         KeyboardState newState;
         KeyboardState oldState;
 
+        LivePlot plot;  // form displaying plot of metrics
+
         int SCREEN_WIDTH = 1200;
         int SCREEN_HEIGHT = 900;
         int MAP_WIDTH;
@@ -69,6 +71,11 @@ namespace RoutingPrototype
             graphics.PreferredBackBufferWidth = SCREEN_WIDTH;
             graphics.PreferredBackBufferHeight = SCREEN_HEIGHT;
             graphics.ApplyChanges();
+
+            
+            plot = new LivePlot();
+            plot.Show();
+
             base.Initialize();
         }
 
