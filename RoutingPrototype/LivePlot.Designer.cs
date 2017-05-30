@@ -37,9 +37,13 @@ namespace RoutingPrototype
             // 
             // cartesianChart1
             // 
-            this.cartesianChart1.Location = new System.Drawing.Point(5, 1);
+            this.cartesianChart1.BackColor = System.Drawing.SystemColors.WindowFrame;
+            this.cartesianChart1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cartesianChart1.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cartesianChart1.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.cartesianChart1.Location = new System.Drawing.Point(0, 0);
             this.cartesianChart1.Name = "cartesianChart1";
-            this.cartesianChart1.Size = new System.Drawing.Size(556, 337);
+            this.cartesianChart1.Size = new System.Drawing.Size(573, 337);
             this.cartesianChart1.TabIndex = 0;
             this.cartesianChart1.Text = "cartesianChart1";
             // 

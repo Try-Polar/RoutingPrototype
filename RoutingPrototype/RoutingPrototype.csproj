@@ -64,6 +64,11 @@
     <Compile Include="MovingEntity.cs" />
     <Compile Include="Pod.cs" />
     <Compile Include="PodManager.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Route.cs" />
     <Compile Include="RouteManager.cs" />
     <Compile Include="RoutingPrototype.cs" />
@@ -100,6 +105,10 @@
     <EmbeddedResource Include="Icon.bmp" />
     <EmbeddedResource Include="LivePlot.resx">
       <DependentUpon>LivePlot.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

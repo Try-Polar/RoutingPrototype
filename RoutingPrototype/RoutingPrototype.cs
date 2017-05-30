@@ -193,7 +193,7 @@ namespace RoutingPrototype
 
         private void dispatcherTimer_Tick(object sender, EventArgs eventArgs)
         {
-            plot.updatePlot(metricManager.getKilometersSavedBySkeins());
+            plot.updatePlot(metricManager.SkeinKilometresTravelled, metricManager.NonSkeinKilometresTravelled);
         }
     }
 }

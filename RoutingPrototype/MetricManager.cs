@@ -10,8 +10,9 @@ namespace RoutingPrototype
 {
     class MetricManager : IUpdateDraw
     {
-        float mKilometersSavedBySkeins = 0;
-        float mKilometersLost = 0;
+        float mKilometresSavedBySkeins = 0;
+        float mKilometresNonSkeinTravelled = 0;
+        float mKilometresSkeinTravelled = 0;
         float mPixelToKilometerConverter;
 
         PodManager mPodManager;
@@ -29,7 +30,9 @@ namespace RoutingPrototype
             {
                 if (pod.newData)
                 {
-                    mKilometersSavedBySkeins += (pod.NonSkeinDistanceTravelled - pod.ActualDistanceTravelled - 1.5f) * mPixelToKilometerConverter; //Seems to misjudge a little so -1 essentially corrects this
+                    mKilometresSavedBySkeins += (pod.NonSkeinDistanceTravelled - pod.ActualDistanceTravelled - 1.5f) * mPixelToKilometerConverter; //Seems to misjudge a little so -1 essentially corrects this
+                    mKilometresNonSkeinTravelled += (pod.NonSkeinDistanceTravelled - 1.5f) * mPixelToKilometerConverter;
+                    mKilometresSkeinTravelled += (pod.ActualDistanceTravelled - 1.5f) * mPixelToKilometerConverter;
                     pod.newData = false;
                 }
             }
@@ -41,15 +44,19 @@ namespace RoutingPrototype
 
         }
 
-        public float getKilometersSavedBySkeins()
+        public float KilometresSavedBySkeins
         {
-            return mKilometersSavedBySkeins;
+            get { return mKilometresSavedBySkeins; }
         }
 
-        public float getKilometersLost()
+        public float NonSkeinKilometresTravelled
         {
-            return mKilometersLost;
+            get { return mKilometresNonSkeinTravelled; }
         }
 
+        public float SkeinKilometresTravelled
+        {
+            get { return mKilometresSkeinTravelled; }
+        }
     }
 }
