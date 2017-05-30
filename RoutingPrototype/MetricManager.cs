@@ -10,8 +10,8 @@ namespace RoutingPrototype
 {
     class MetricManager : IUpdateDraw
     {
-        float kilometersSavedBySkeins = 0;
-
+        float mKilometersSavedBySkeins = 0;
+        float mKilometersLost = 0;
         float mPixelToKilometerConverter;
 
         PodManager mPodManager;
@@ -29,7 +29,7 @@ namespace RoutingPrototype
             {
                 if (pod.newData)
                 {
-                    kilometersSavedBySkeins += (pod.NonSkeinDistanceTravelled - pod.ActualDistanceTravelled - 1.5f) * mPixelToKilometerConverter; //Seems to misjudge a little so -1 essentially corrects this
+                    mKilometersSavedBySkeins += (pod.NonSkeinDistanceTravelled - pod.ActualDistanceTravelled - 1.5f) * mPixelToKilometerConverter; //Seems to misjudge a little so -1 essentially corrects this
                     pod.newData = false;
                 }
             }
@@ -39,6 +39,16 @@ namespace RoutingPrototype
         public void Draw(SpriteBatch spritebatch)
         {
 
+        }
+
+        public float getKilometersSavedBySkeins()
+        {
+            return mKilometersSavedBySkeins;
+        }
+
+        public float getKilometersLost()
+        {
+            return mKilometersLost;
         }
 
     }

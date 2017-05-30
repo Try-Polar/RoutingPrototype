@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Windows.Threading;
 
 namespace RoutingPrototype
 {
@@ -32,6 +33,7 @@ namespace RoutingPrototype
         KeyboardState oldState;
 
         LivePlot plot;  // form displaying plot of metrics
+        DispatcherTimer dispatcherTimer;    // timer for plotting data every second
 
         int SCREEN_WIDTH = 1200;
         int SCREEN_HEIGHT = 900;
@@ -72,9 +74,13 @@ namespace RoutingPrototype
             graphics.PreferredBackBufferHeight = SCREEN_HEIGHT;
             graphics.ApplyChanges();
 
-            
             plot = new LivePlot();
             plot.Show();
+            // Sets up timer to plot every second
+            dispatcherTimer = new DispatcherTimer();
+            dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+            dispatcherTimer.Start();
 
             base.Initialize();
         }
@@ -160,7 +166,6 @@ namespace RoutingPrototype
                 formationManager.removePod();
             }
 
-
             oldState = newState;
             base.Update(gameTime);
         }
@@ -183,8 +188,12 @@ namespace RoutingPrototype
             routeManager.Draw(spriteBatch);
             cityPodManager.Draw(spriteBatch);
 
-
             base.Draw(gameTime);
+        }
+
+        private void dispatcherTimer_Tick(object sender, EventArgs eventArgs)
+        {
+            plot.updatePlot(metricManager.getKilometersSavedBySkeins());
         }
     }
 }

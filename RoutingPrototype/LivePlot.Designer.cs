@@ -37,7 +37,7 @@ namespace RoutingPrototype
             // 
             // cartesianChart1
             // 
-            this.cartesianChart1.Location = new System.Drawing.Point(5, 0);
+            this.cartesianChart1.Location = new System.Drawing.Point(5, 1);
             this.cartesianChart1.Name = "cartesianChart1";
             this.cartesianChart1.Size = new System.Drawing.Size(556, 337);
             this.cartesianChart1.TabIndex = 0;

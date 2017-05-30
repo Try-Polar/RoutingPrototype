@@ -59,6 +59,7 @@
     <Compile Include="LivePlot.Designer.cs">
       <DependentUpon>LivePlot.cs</DependentUpon>
     </Compile>
+    <Compile Include="MeasureModel.cs" />
     <Compile Include="MetricManager.cs" />
     <Compile Include="MovingEntity.cs" />
     <Compile Include="Pod.cs" />

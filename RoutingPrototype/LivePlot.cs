@@ -1,74 +1,81 @@
 ﻿using System;
 using System.Windows.Forms;
-using System.Windows.Media;
 using LiveCharts;
+using LiveCharts.Configurations;
 using LiveCharts.Wpf;
 
 namespace RoutingPrototype
 {
     public partial class LivePlot : Form
     {
+        public ChartValues<MeasureModel> ChartValues { get; set; }
+
         public LivePlot()
         {
             InitializeComponent();
 
+            // Shamelessly copy and pasted from: https://lvcharts.net/App/examples/v1/wf/Constant%20Changes
+
+            //To handle live data easily, in this case we built a specialized type
+            //the MeasureModel class, it only contains 2 properties
+            //DateTime and Value
+            //We need to configure LiveCharts to handle MeasureModel class
+            //The next code configures MEasureModel  globally, this means
+            //that livecharts learns to plot MeasureModel and will use this config every time
+            //a ChartValues instance uses this type.
+            //this code ideally should only run once, when application starts is recommended.
+            //you can configure series in many ways, learn more at http://lvcharts.net/App/examples/v1/wpf/Types%20and%20Configuration
+
+            var mapper = Mappers.Xy<MeasureModel>()
+                .X(model => model.DateTime.Ticks)   //use DateTime.Ticks as X
+                .Y(model => model.Value);           //use the value property as Y
+            
+            //lets save the mapper globally.
+            Charting.For<MeasureModel>(mapper);
+
+            //the ChartValues property will store our values array
+            ChartValues = new ChartValues<MeasureModel>();
             cartesianChart1.Series = new SeriesCollection
             {
                 new LineSeries
                 {
-                    Title = "Series 1",
-                    Values = new ChartValues<double> {4, 6, 5, 2, 7}
-                },
-                new LineSeries
-                {
-                    Title = "Series 2",
-                    Values = new ChartValues<double> {6, 7, 3, 4, 6},
-                    PointGeometry = null
-                },
-                new LineSeries
-                {
-                    Title = "Series 2",
-                    Values = new ChartValues<double> {5, 2, 8, 3},
-                    PointGeometry = DefaultGeometries.Square,
-                    PointGeometrySize = 15
+                    Values = ChartValues,
+                    PointGeometrySize = 9,
+                    StrokeThickness = 4
                 }
             };
-
             cartesianChart1.AxisX.Add(new Axis
             {
-                Title = "Month",
-                Labels = new[] { "Jan", "Feb", "Mar", "Apr", "May" }
+                DisableAnimations = true,
+                LabelFormatter = value => new System.DateTime((long)value).ToString("mm:ss"),
+                Separator = new Separator
+                {
+                    Step = TimeSpan.FromSeconds(1).Ticks
+                }
             });
 
-            cartesianChart1.AxisY.Add(new Axis
-            {
-                Title = "Sales",
-                LabelFormatter = value => value.ToString("C")
-            });
+            SetAxisLimits(System.DateTime.Now);
 
-            cartesianChart1.LegendLocation = LegendLocation.Right;
-
-            //modifying the series collection will animate and update the chart
-            cartesianChart1.Series.Add(new LineSeries
-            {
-                Values = new ChartValues<double> { 5, 3, 2, 4, 5 },
-                LineSmoothness = 0, //straight lines, 1 really smooth lines
-                PointGeometry = Geometry.Parse("m 25 70.36218 20 -28 -20 22 -8 -6 z"),
-                PointGeometrySize = 50,
-                PointForeground = Brushes.Gray
-            });
-
-            //modifying any series values will also animate and update the chart
-            cartesianChart1.Series[2].Values.Add(5d);
-
-
-            cartesianChart1.DataClick += CartesianChart1OnDataClick;
         }
 
-        private void CartesianChart1OnDataClick(object sender, ChartPoint chartPoint)
+        private void SetAxisLimits(System.DateTime now)
         {
-            MessageBox.Show("You clicked (" + chartPoint.X + "," + chartPoint.Y + ")");
+            cartesianChart1.AxisX[0].MaxValue = now.Ticks + TimeSpan.FromSeconds(1).Ticks; // lets force the axis to be 100ms ahead
+            cartesianChart1.AxisX[0].MinValue = now.Ticks - TimeSpan.FromSeconds(8).Ticks; //we only care about the last 8 seconds
         }
-    }
 
+        public void updatePlot(float value)
+        {
+            var now = System.DateTime.Now;
+
+            ChartValues.Add(new MeasureModel
+            {
+                DateTime = now,
+                Value = value
+            });
+
+            SetAxisLimits(now);
+        }
+    
+    }
 }
