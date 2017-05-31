@@ -47,7 +47,7 @@ namespace RoutingPrototype
         float mDistMulti;
         float maxDistance;
         float mSkeinBonusMultiplier = 0.85f;
-        float mChanceToLandInCity = 0.05f;
+        float mChanceToLandInCity = 0.15f;
 
         int id;
 

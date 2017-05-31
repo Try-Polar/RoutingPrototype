@@ -41,6 +41,12 @@ namespace RoutingPrototype
             set { mRectangle = value; }
         }
 
+        public void setRectWidthHeight(int width, int height)
+        {
+            mRectangle.Width = width;
+            mRectangle.Height = height;
+        }
+
         public void setRectanglePos(Vector2 pos)
         {
             mRectangle.X = (int)pos.X;

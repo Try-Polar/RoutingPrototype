@@ -29,9 +29,9 @@ namespace RoutingPrototype
 
         Vector2 mTarget;
 
-        public CityPod(Texture2D texture, Vector2 pos, float screenWidth, Vector2 cityCenter, Vector2 takeOffDirection, int rndX, int rndY, Pod pod) : base (texture, pos)
+        public CityPod(Texture2D texture, Vector2 pos, float screenWidth, Vector2 cityCenter, Vector2 takeOffDirection, int rndX, int rndY, Pod pod, int cityRadius) : base (texture, pos)
         {
-            mCityRadius = (int)screenWidth / 12;
+            mCityRadius = cityRadius;
             mCityCenter = cityCenter;
             takeOffDirection.Normalize();
             mTakeOffTarget = mCityCenter + (takeOffDirection * mCityRadius);

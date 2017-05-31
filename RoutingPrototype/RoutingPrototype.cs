@@ -19,6 +19,7 @@ namespace RoutingPrototype
         Texture2D destinationTexture;
         Texture2D lineTexture; //a 1x1 texture
         Texture2D cityTexture;
+        Texture2D collabCityTexture;
         Texture2D background;
         Rectangle backgroundRectangle;
 
@@ -100,13 +101,14 @@ namespace RoutingPrototype
             destinationTexture = Content.Load<Texture2D>("Destination");
             lineTexture = Content.Load<Texture2D>("Line");
             cityTexture = Content.Load<Texture2D>("City");
+            collabCityTexture = Content.Load<Texture2D>("CollabCity");
             background = Content.Load<Texture2D>("BackgroundRescaled");
             backgroundRectangle = new Rectangle(0, 0, MAP_WIDTH, MAP_HEIGHT);
 
             formationManager = new FormationManager(formationPodTexture, new Vector2(SCREEN_WIDTH, SCREEN_HEIGHT));
             cityManager = new CityManager(cityTexture, MAP_WIDTH, MAP_HEIGHT);
             routeManager = new RouteManager(destinationTexture, lineTexture, cityManager, MAP_WIDTH, MAP_HEIGHT);
-            cityPodManager = new CityPodManager(podTexture, SCREEN_WIDTH, SCREEN_HEIGHT, new Vector2(1050, SCREEN_HEIGHT / 2), cityTexture);
+            cityPodManager = new CityPodManager(podTexture, SCREEN_WIDTH, SCREEN_HEIGHT, new Vector2(1050, SCREEN_HEIGHT / 2), collabCityTexture);
             podManager = new PodManager(podTexture, destinationTexture, routeManager, cityManager.Cities[0].Position, kilometerToPixelMultiplier, hourToSecondMultiplier, cityPodManager);
             metricManager = new MetricManager(podManager, UKpixelReference, UKKilometerReference);
             //cityPodManager = new CityPodManager(podTexture, SCREEN_WIDTH, new Vector2(SCREEN_WIDTH * (7 / 8), SCREEN_HEIGHT / 2), cityTexture);

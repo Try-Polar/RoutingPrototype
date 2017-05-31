@@ -17,16 +17,20 @@ namespace RoutingPrototype
         int mLeftBoundary;
         int mUpperBoundary;
         int mLowerBoundary;
+        Vector2 mCityPosition;
         CollaboratingCity mCity;
+        int mCityRadius;
         Random rnd;
 
         public CityPodManager(Texture2D podTexture, int screenWidth, int screenHeight, Vector2 cityPosition, Texture2D cityTexture )
         {
             mPods = new List<CityPod>();
+            mCityPosition = cityPosition;
             mPodTexture = podTexture;
             mScreenWidth = screenWidth;
             mScreenHeight = screenHeight;
-            mCity = new CollaboratingCity(cityTexture, cityPosition);
+            mCityRadius = (mScreenWidth / 12);
+            mCity = new CollaboratingCity(cityTexture, cityPosition, mCityRadius);
             mLeftBoundary = (int)(0.75f * mScreenWidth);
             mUpperBoundary = (int)(0.3333f * mScreenHeight);
             mLowerBoundary = (int)(0.6666f * mScreenHeight);
@@ -35,7 +39,7 @@ namespace RoutingPrototype
 
         public void AddPod(Pod pod)
         {
-            mPods.Add(new CityPod(mPodTexture, new Vector2(mLeftBoundary + 10, mUpperBoundary + 10), mScreenWidth, mCity.Position, new Vector2(rnd.Next(-5, 5), rnd.Next(-5, 5)), rnd.Next(-5,5), rnd.Next(-5, 5), pod));
+            mPods.Add(new CityPod(mPodTexture, new Vector2(mLeftBoundary + 10, mUpperBoundary + 10), mScreenWidth, mCityPosition, new Vector2(rnd.Next(-5, 5), rnd.Next(-5, 5)), rnd.Next(-5,5), rnd.Next(-5, 5), pod, mCityRadius));
         }
 
         public void Update(GameTime gameTime)

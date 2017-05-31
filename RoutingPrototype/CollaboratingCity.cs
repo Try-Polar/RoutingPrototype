@@ -10,10 +10,14 @@ namespace RoutingPrototype
 {
     class CollaboratingCity : BaseEntity, IUpdateDraw
     {
+        int mCityRadius;
 
-        public CollaboratingCity(Texture2D texture, Vector2 pos) : base (texture, pos)
+        public CollaboratingCity(Texture2D texture, Vector2 pos, int cityRadius) : base (texture, pos)
         {
-            this.updateRectanglePos();
+            mCityRadius = cityRadius;
+            Position -= new Vector2(cityRadius, cityRadius);
+            updateRectanglePos();
+            setRectWidthHeight(mCityRadius * 2, mCityRadius * 2);
         }
 
         public void Update(GameTime gameTime)
@@ -23,6 +27,8 @@ namespace RoutingPrototype
 
         public void Draw(SpriteBatch spriteBatch)
         {
+            //won't let me do this in the constructor :(
+
             spriteBatch.Begin();
             spriteBatch.Draw(Texture, Rect, Color.White);
             spriteBatch.End();
