@@ -29,7 +29,7 @@ namespace RoutingPrototype
         float mTimeMulti;
 
 
-        public PodManager(Texture2D podText, Texture2D destinationText, RouteManager routeManager, Vector2 startLocation, float distMulti, float timeMulti, CityPodManager cityPodManager)
+        public PodManager(Texture2D podText, Texture2D destinationText, RouteManager routeManager, Vector2 startLocation, float distMulti, float timeMulti, CityPodManager cityPodManager = null)
         {
             mPodTexture = podText;
             mDestinationTexture = destinationText;

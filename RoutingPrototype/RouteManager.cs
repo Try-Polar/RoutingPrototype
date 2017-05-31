@@ -12,6 +12,7 @@ namespace RoutingPrototype
     {
         int mScreenWidth;
         int mScreenHeight;
+        int mMapWidth;
 
         float mSpawnInterval = 0.05f;
         float mSpawnTimer = 0;
@@ -19,22 +20,29 @@ namespace RoutingPrototype
         List<Route> mUnassignedRoutes;
         List<Route> mAssignedRoutes;
 
+        Vector2 mPortLocation;
+
         Texture2D mMarkerTexture, mLineTexture;
 
         CityManager cityManager;
 
         Random rnd;
 
-        public RouteManager(Texture2D markerText, Texture2D lineText, CityManager cityManager, int screenWidth, int screenHeight)
+        Simulation simulation;
+
+        public RouteManager(Texture2D markerText, Texture2D lineText, int screenWidth, int screenHeight, Simulation sim, CityManager cityManager = null)
         {
             mScreenWidth = screenWidth;
             mScreenHeight = screenHeight;
+            mMapWidth = (int)(mScreenWidth * 0.75f);
             mMarkerTexture = markerText;
             mLineTexture = lineText;
             rnd = new Random();
             mUnassignedRoutes = new List<Route>();
             mAssignedRoutes = new List<Route>();
             this.cityManager = cityManager;
+            mPortLocation = new Vector2(mScreenWidth / 6, screenHeight / 2);
+            simulation = sim;
             //For testing purposes only---
             //mUnassignedRoutes.Add(new Route(mMarkerTexture, mLineTexture, new Vector2(615, 488), new Vector2(727, 728)));
             //mUnassignedRoutes.Add(new Route(mMarkerTexture, mLineTexture, new Vector2(589, 522), new Vector2(727, 728)));
@@ -106,9 +114,32 @@ namespace RoutingPrototype
                 }
             } while (a == b);
 
-            Route route = new Route(mMarkerTexture, mLineTexture, pickUpLocation, dropOffLocation);
+            return new Route(mMarkerTexture, mLineTexture, pickUpLocation, dropOffLocation);
+        }
+        
+        private Route generateRouteForBoatSim()
+        {
+            Vector2 pickUpLoc = mPortLocation;
+            Vector2 dropOffLoc = Vector2.Zero;
 
-            return route;
+            int y = rnd.Next(0, mScreenHeight);
+            int x = 0;
+            if (y < 50)
+            {
+                x = rnd.Next(225, mMapWidth);
+            }
+            else if (y >= 50 && y < 200)
+            {
+                x = rnd.Next(300, mMapWidth);
+            }
+            else if ( y >= 200)
+            {
+                x = rnd.Next(240, mMapWidth);
+            }
+            dropOffLoc.X = x;
+            dropOffLoc.Y = y;
+
+            return new Route(mMarkerTexture, mLineTexture, pickUpLoc, dropOffLoc);
         }
 
         public void Update(GameTime gameTime)
@@ -119,7 +150,17 @@ namespace RoutingPrototype
                 mSpawnTimer = 0;
                 //Spawn a new route
                 //mUnassignedRoutes.Add(generateRandomRoute());
-                mUnassignedRoutes.Add(generateRealisticRoute());
+                if (mUnassignedRoutes.Count < 20)
+                {
+                    if (simulation == Simulation.UK)
+                    {
+                        mUnassignedRoutes.Add(generateRealisticRoute());
+                    }
+                    if (simulation == Simulation.Boat)
+                    {
+                        mUnassignedRoutes.Add(generateRouteForBoatSim());
+                    }
+                }
             }
         }
 

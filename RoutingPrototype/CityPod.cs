@@ -54,20 +54,17 @@ namespace RoutingPrototype
             //Check current status
             if (mCurrentStatus == STATUS.landing && Vector2.Distance(mCityCenter, Position) < mCityRadius)
             {
-                Console.WriteLine("Landed");
                 mCurrentStatus = STATUS.centering;
                 mTarget = mCityCenter;
                 VELOCITY = 20;
             }
             if (mCurrentStatus == STATUS.centering && Vector2.Distance(mCityCenter, Position) < 2)
             {
-                Console.WriteLine("Centered");
                 mCurrentStatus = STATUS.leaving;
                 mTarget = mTakeOffTarget;
             }
             if (mCurrentStatus == STATUS.leaving && Vector2.Distance(mTakeOffTarget, Position) < 2)
             {
-                Console.WriteLine("TakenOff");
                 VELOCITY = 50;
                 mCurrentStatus = STATUS.takingOff;
                 mTarget = mExitPoint;

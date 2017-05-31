@@ -38,12 +38,11 @@ namespace RoutingPrototype
         Vector2 mCurrentVector;
 
 
-        float mEnergy = 100;
+        float mEnergy = 300;
         float mMinimumEnergyThreshold = 5;
-        float mSufficientChargeThreshold = 95;
-        float mRechargeRate = 60;
+        float mSufficientChargeThreshold = 295;
+        float mRechargeRate = 120;
         bool mRecharging = false;
-        float mDistanceScaler = 0.25f;
         float mDistMulti;
         float maxDistance;
         float mSkeinBonusMultiplier = 0.85f;
@@ -74,10 +73,17 @@ namespace RoutingPrototype
             mGoal = initialPosition;
             mCityManager = cityManager;
             mCityPodManager = cityPodManager;
-            maxDistance = 100 / mDistanceScaler;
+            maxDistance = 300 / mDistMulti;
             VELOCITY = 300 * distMulti / timeMulti;
             mDistMulti = distMulti;
-            mLondonLocation = cityManager.findLondon();
+            try
+            {
+                mLondonLocation = cityManager.findLondon();
+            }
+            catch (NullReferenceException)
+            {
+                mLondonLocation = Vector2.Zero;
+            }
         }
 
         //This will be abstract in this class, just using this here to make a very quick demonstration
@@ -114,21 +120,23 @@ namespace RoutingPrototype
                     currentStatus = STATUS.Free;
                     mRecentlyFreed = true;
                     mColor = Color.White;
-                    if (rnd.NextDouble() < mChanceToLandInCity)
+                    if (mCityManager != null)
                     {
-                        Console.WriteLine(id + "Landing");
-                        //"Land" in city
-                        currentStatus = STATUS.inCity;
-                        if (Vector2.Distance(Position, mLondonLocation) < 2)
+                        if (rnd.NextDouble() < mChanceToLandInCity)
                         {
-                            mInLondon = true;
+                            //"Land" in city
+                            currentStatus = STATUS.inCity;
+                            if (Vector2.Distance(Position, mLondonLocation) < 2)
+                            {
+                                mInLondon = true;
+                            }
+                            else
+                            {
+                                mInLondon = false;
+                            }
+                            mCityPodManager.AddPod(this);
+                            mColor = Color.Blue;
                         }
-                        else
-                        {
-                            mInLondon = false;
-                        }
-                        mCityPodManager.AddPod(this);
-                        mColor = Color.Blue;
                     }
                 }  
             }
@@ -150,6 +158,7 @@ namespace RoutingPrototype
 
         private void movement(GameTime gameTime)
         {
+            
             if (currentStatus == STATUS.inCity)
             {
                 return;
@@ -166,15 +175,24 @@ namespace RoutingPrototype
                     mGoal = mCurrentRoute.DropOff;
                     mTarget = mGoal;
                 }
-
-                if (distanceTo(mGoal) + 25 > distanceAvailable() && !mRecharging) //Maybe should be target NOT GOAL
+                
+                if (((distanceTo(mGoal) + 10))  > distanceAvailable() && !mRecharging) //Maybe should be target NOT GOAL
                 {
-                    City chargingPoint = findBestChargingPoint();
-                    if (chargingPoint != null)
+                    if (mCityManager != null)
+                    {
+                        City chargingPoint = findBestChargingPoint();
+                        if (chargingPoint != null)
+                        {
+                            mGoingToCharge = true;
+                            mRecharging = false;
+                            mGoal = chargingPoint.Position;
+                        }
+                    }
+                    else
                     {
                         mGoingToCharge = true;
                         mRecharging = false;
-                        mGoal = chargingPoint.Position;
+                        mGoal = Position;
                     }
                 }
                 mTarget = mGoal; //Might seem redundant, to do this right after setting mGoal, but mTarget is likely to change while mGoal will not
@@ -189,10 +207,10 @@ namespace RoutingPrototype
                     mJourneyStarted = false;
                     mRecharging = true;
                     mEnergy += (float)gameTime.ElapsedGameTime.TotalSeconds * mRechargeRate;
-                    if (mEnergy > 100)
+                    if (mEnergy > 300)
                     {
                         mOnFinalApproach = false;
-                        mEnergy = 100;
+                        mEnergy = 300;
                         mGoingToCharge = false;
                         mRecharging = false;
                     }
@@ -205,9 +223,11 @@ namespace RoutingPrototype
             if (mEnergy < mMinimumEnergyThreshold)
             {
                 mRecharging = true;
+
             }
             if (!mRecharging)
-            { 
+            {
+                //Console.WriteLine(distanceTo(mGoal) / mDistMulti + ", " + distanceAvailable());
                 if (mInSkein && currentStatus != STATUS.Free)
                 {
                     float angle = angleBetweenVectors((mGoal - Position), this.Skein.getCurrentVector());
@@ -246,9 +266,7 @@ namespace RoutingPrototype
                 }
 
                 Vector2 acceleration = arrive(mTarget) / mMass;
-                //Console.WriteLine("Aceceleration: " + acceleration);
                 Velocity += acceleration * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                //Console.WriteLine("Velocity: " + Velocity);
 
                 if (Velocity.Length() > maxVelocity)
                 {
@@ -258,16 +276,15 @@ namespace RoutingPrototype
                 //Update position based on current velocity
                 Vector2 distanceMoved = (Velocity * (float)gameTime.ElapsedGameTime.TotalSeconds) * VELOCITY;
                 Position = Position + distanceMoved;
-                //Console.WriteLine(Position);
                 //Deduct energy based on distance moved (going to need to scale things to be appropriate to actual map)
                 if (!inFormation)
                 {
-                    mEnergy -= distanceMoved.Length() * mDistanceScaler;
+                    mEnergy -= distanceMoved.Length() / mDistMulti;
                     mDistTravelledOnJourney += distanceMoved.Length();
                 }
                 else
                 {
-                    mEnergy -= distanceMoved.Length() * mDistanceScaler * mSkeinBonusMultiplier;
+                    mEnergy -= distanceMoved.Length() * mSkeinBonusMultiplier / mDistMulti;
                     mDistTravelledOnJourney += distanceMoved.Length() * mSkeinBonusMultiplier;
                 }
                 if (mEnergy < 0)
@@ -276,12 +293,17 @@ namespace RoutingPrototype
             else //Recharge
             {
                 mEnergy += (float)gameTime.ElapsedGameTime.TotalSeconds * mRechargeRate;
-                if (mEnergy > 100)
-                    mEnergy = 100;
+                if (mEnergy > 300)
+                    mEnergy = 300;
                 if (mEnergy > mSufficientChargeThreshold)
                 {
                     mRecharging = false;
+                    mColor = Color.White;
                 }
+            }
+            if (mRecharging == true)
+            {
+                mColor = Color.Orange;
             }
                 this.setRectanglePos(Position);
         }
@@ -318,7 +340,7 @@ namespace RoutingPrototype
 
         float distanceAvailable()
         {
-            return mEnergy / mDistanceScaler;
+            return mEnergy * mDistMulti;
         }
 
         float distanceTo(Vector2 loc)
@@ -337,7 +359,7 @@ namespace RoutingPrototype
             City bestCity = null;
             foreach (City city in mCityManager.Cities)
             {
-                if (distanceTo(city.Position) < distanceAvailable())
+                if ((distanceTo(city.Position) + 10)  < distanceAvailable())
                 {
                     if (distanceBetween(city.Position, mGoal) < bestDistanceToTarget)
                     {
@@ -457,7 +479,6 @@ namespace RoutingPrototype
             currentStatus = STATUS.Free;
             mColor = Color.White;
             mTarget = mGoal;
-            Console.WriteLine(id + "LeavingCity");
         }
 
         public bool onFinalApproach

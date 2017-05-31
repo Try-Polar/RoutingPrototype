@@ -6,11 +6,15 @@ using System.Windows.Threading;
 
 namespace RoutingPrototype
 {
+    enum Simulation { UK, Boat };
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
     public class RoutingPrototype : Game
     {
+        
+        Simulation currentSimulation = Simulation.UK;
+
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
@@ -20,15 +24,23 @@ namespace RoutingPrototype
         Texture2D lineTexture; //a 1x1 texture
         Texture2D cityTexture;
         Texture2D collabCityTexture;
-        Texture2D background;
-        Rectangle backgroundRectangle;
+        Texture2D UKBackground;
+        Rectangle UKBackgroundRectangle;
+        Texture2D boatBackground;
+        Rectangle boatBackgroundRectangle;
 
         FormationManager formationManager;
-        PodManager podManager;
-        RouteManager routeManager;
-        CityManager cityManager;
-        MetricManager metricManager;
-        CityPodManager cityPodManager;
+        PodManager UKpodManager;
+        RouteManager UKrouteManager;
+        CityManager UKcityManager;
+        MetricManager UKmetricManager;
+        CityPodManager UKcityPodManager;
+
+        PodManager boatPodManager;
+        RouteManager boatRouteManager;
+        //CityManager boatCityManager;
+        //MetricManager boatMetricManager;
+        //CityPodManager boatCityPodManager;
 
         KeyboardState newState;
         KeyboardState oldState;
@@ -36,18 +48,22 @@ namespace RoutingPrototype
         LivePlot plot;  // form displaying plot of metrics
         DispatcherTimer dispatcherTimer;    // timer for plotting data every second
 
-        int SCREEN_WIDTH = 1200;
-        int SCREEN_HEIGHT = 900;
+        int SCREEN_WIDTH = 800;
+        int SCREEN_HEIGHT = 600;
         int MAP_WIDTH;
         int MAP_HEIGHT;
 
         //FOR CREATION PURPOSES
         bool mouseJustPressed = false;
 
-        float kilometerToPixelMultiplier; //Based on distance from london to bristol
-        float hourToSecondMultiplier; //1 minute of real time is one day of simulation time
+        float UKKilometerToPixelMultiplier; //Based on distance from london to bristol
+        float UKHourToSecondMultiplier; //1 minute of real time is one day of simulation time
         float UKpixelReference = 212.1909f;
         float UKKilometerReference = 172;
+        float boatKilometerToPixelMultiplier;
+        float boatHourToSecondMultiplier;
+        float boatPixelReference = 203.8553f;
+        float boatKilometerReference = 5.3f;
 
         public RoutingPrototype()
         {
@@ -66,8 +82,10 @@ namespace RoutingPrototype
             MAP_WIDTH = (int)(0.75f * SCREEN_WIDTH);
             MAP_HEIGHT = SCREEN_HEIGHT;
 
-            kilometerToPixelMultiplier = (float)((UKpixelReference * (SCREEN_WIDTH / 1200)) / UKKilometerReference);
-            hourToSecondMultiplier = (120 / 24);
+            UKKilometerToPixelMultiplier = ((UKpixelReference * ((float)SCREEN_WIDTH / (float)1200)) / UKKilometerReference);
+            UKHourToSecondMultiplier = (120 / 24);
+            boatKilometerToPixelMultiplier = ((boatPixelReference * ((float)SCREEN_HEIGHT / (float)1200)) / boatKilometerReference);
+            boatHourToSecondMultiplier = (1200 / 24);
 
             this.IsMouseVisible = true;
 
@@ -82,6 +100,8 @@ namespace RoutingPrototype
             dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
             dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
             dispatcherTimer.Start();
+
+            Console.WriteLine(Vector2.Distance(new Vector2(261, 305), new Vector2(227, 506)));
 
             base.Initialize();
         }
@@ -102,19 +122,23 @@ namespace RoutingPrototype
             lineTexture = Content.Load<Texture2D>("Line");
             cityTexture = Content.Load<Texture2D>("City");
             collabCityTexture = Content.Load<Texture2D>("CollabCity");
-            background = Content.Load<Texture2D>("BackgroundRescaled");
-            backgroundRectangle = new Rectangle(0, 0, MAP_WIDTH, MAP_HEIGHT);
+            UKBackground = Content.Load<Texture2D>("BackgroundRescaled");
+            UKBackgroundRectangle = new Rectangle(0, 0, MAP_WIDTH, MAP_HEIGHT);
+            boatBackground = Content.Load<Texture2D>("BoatBackground");
+            boatBackgroundRectangle = new Rectangle(0, 0, MAP_WIDTH, MAP_HEIGHT);
 
             formationManager = new FormationManager(formationPodTexture, new Vector2(SCREEN_WIDTH, SCREEN_HEIGHT));
-            cityManager = new CityManager(cityTexture, MAP_WIDTH, MAP_HEIGHT);
-            routeManager = new RouteManager(destinationTexture, lineTexture, cityManager, MAP_WIDTH, MAP_HEIGHT);
-            cityPodManager = new CityPodManager(podTexture, SCREEN_WIDTH, SCREEN_HEIGHT, new Vector2(1050, SCREEN_HEIGHT / 2), collabCityTexture);
-            podManager = new PodManager(podTexture, destinationTexture, routeManager, cityManager.Cities[0].Position, kilometerToPixelMultiplier, hourToSecondMultiplier, cityPodManager);
-            metricManager = new MetricManager(podManager, UKpixelReference, UKKilometerReference);
-            //cityPodManager = new CityPodManager(podTexture, SCREEN_WIDTH, new Vector2(SCREEN_WIDTH * (7 / 8), SCREEN_HEIGHT / 2), cityTexture);
+            UKcityManager = new CityManager(cityTexture, MAP_WIDTH, MAP_HEIGHT);
+            UKrouteManager = new RouteManager(destinationTexture, lineTexture, MAP_WIDTH, MAP_HEIGHT, Simulation.UK, UKcityManager);
+            UKcityPodManager = new CityPodManager(podTexture, SCREEN_WIDTH, SCREEN_HEIGHT, new Vector2(1050, SCREEN_HEIGHT / 2), collabCityTexture);
+            UKpodManager = new PodManager(podTexture, destinationTexture, UKrouteManager, UKcityManager.Cities[0].Position, UKKilometerToPixelMultiplier, UKHourToSecondMultiplier, UKcityPodManager);
+            UKmetricManager = new MetricManager(UKpodManager, UKpixelReference, UKKilometerReference);
+       
             
-
-            // TODO: use this.Content to load your game content here
+            //boatCityManager = new CityManager(cityTexture, SCREEN_WIDTH, SCREEN_HEIGHT);
+            boatRouteManager = new RouteManager(destinationTexture, lineTexture, SCREEN_WIDTH, SCREEN_HEIGHT, Simulation.Boat);
+            //boatCityPodManager = new CityPodManager(podTexture, SCREEN_WIDTH, SCREEN_HEIGHT, new Vector2(1050, SCREEN_HEIGHT / 2), collabCityTexture);
+            boatPodManager = new PodManager(podTexture, destinationTexture, boatRouteManager, new Vector2(0, SCREEN_HEIGHT / 2), boatKilometerToPixelMultiplier, boatHourToSecondMultiplier);
         }
 
         /// <summary>
@@ -137,10 +161,20 @@ namespace RoutingPrototype
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
             formationManager.Update(gameTime);
-            podManager.Update(gameTime);
-            routeManager.Update(gameTime);
-            metricManager.Update(gameTime);
-            cityPodManager.Update(gameTime);
+            if (currentSimulation == Simulation.UK)
+            {
+                UKpodManager.Update(gameTime);
+                UKrouteManager.Update(gameTime);
+                UKmetricManager.Update(gameTime);
+                UKcityPodManager.Update(gameTime);
+            }
+            if (currentSimulation == Simulation.Boat)
+            {
+                boatPodManager.Update(gameTime);
+                boatRouteManager.Update(gameTime);
+                //boatMetricManager.Update(gameTime);
+                //boatCityManager.Update(gameTime);
+            }
 
             //FOR THE PURPOSES OF SETTING UP CITIES ONLY
             MouseState mouseState = Mouse.GetState();
@@ -167,6 +201,14 @@ namespace RoutingPrototype
             {
                 formationManager.removePod();
             }
+            if (newState.IsKeyUp(Keys.D1) && oldState.IsKeyDown(Keys.D1))
+            {
+                currentSimulation = Simulation.UK;
+            }
+            if (newState.IsKeyUp(Keys.D2) && oldState.IsKeyDown(Keys.D2))
+            {
+                currentSimulation = Simulation.Boat;
+            }
 
             oldState = newState;
             base.Update(gameTime);
@@ -181,21 +223,33 @@ namespace RoutingPrototype
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             formationManager.Draw(spriteBatch);
-            
-            spriteBatch.Begin();
-            spriteBatch.Draw(background, backgroundRectangle, Color.White);
-            spriteBatch.End();
-            cityManager.Draw(spriteBatch);
-            podManager.Draw(spriteBatch);
-            routeManager.Draw(spriteBatch);
-            cityPodManager.Draw(spriteBatch);
+            if (currentSimulation == Simulation.UK)
+            {
+                spriteBatch.Begin();
+                spriteBatch.Draw(UKBackground, UKBackgroundRectangle, Color.White);
+                spriteBatch.End();
+                UKcityManager.Draw(spriteBatch);
+                UKpodManager.Draw(spriteBatch);
+                UKrouteManager.Draw(spriteBatch);
+                UKcityPodManager.Draw(spriteBatch);
+            }
+            if (currentSimulation == Simulation.Boat)
+            {
+                spriteBatch.Begin();
+                spriteBatch.Draw(boatBackground, boatBackgroundRectangle, Color.White);
+                spriteBatch.End();
+                //boatCityManager.Draw(spriteBatch);
+                boatPodManager.Draw(spriteBatch);
+                boatRouteManager.Draw(spriteBatch);
+                //boatCityPodManager.Draw(spriteBatch);
+            }
 
             base.Draw(gameTime);
         }
 
         private void dispatcherTimer_Tick(object sender, EventArgs eventArgs)
         {
-            plot.updatePlot(metricManager.SkeinKilometresTravelled, metricManager.NonSkeinKilometresTravelled);
+            plot.updatePlot(UKmetricManager.SkeinKilometresTravelled, UKmetricManager.NonSkeinKilometresTravelled);
         }
     }
 }

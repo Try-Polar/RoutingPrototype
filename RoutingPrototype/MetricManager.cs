@@ -32,11 +32,11 @@ namespace RoutingPrototype
                 {
                     mKilometresSavedBySkeins += (pod.NonSkeinDistanceTravelled - pod.ActualDistanceTravelled - 1.5f) * mPixelToKilometerConverter; //Seems to misjudge a little so -1 essentially corrects this
                     mKilometresNonSkeinTravelled += (pod.NonSkeinDistanceTravelled - 1.5f) * mPixelToKilometerConverter;
-                    mKilometresSkeinTravelled += (pod.ActualDistanceTravelled - 1.5f) * mPixelToKilometerConverter;
+                    mKilometresSkeinTravelled += (pod.ActualDistanceTravelled) * mPixelToKilometerConverter;
                     pod.newData = false;
                 }
             }
-            //Console.WriteLine(kilometersSavedBySkeins);
+            //Console.WriteLine(mKilometresSavedBySkeins);
         }
 
         public void Draw(SpriteBatch spritebatch)
