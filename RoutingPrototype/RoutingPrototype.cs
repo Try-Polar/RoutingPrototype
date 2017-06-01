@@ -130,7 +130,7 @@ namespace RoutingPrototype
             formationManager = new FormationManager(formationPodTexture, new Vector2(SCREEN_WIDTH, SCREEN_HEIGHT));
             UKcityManager = new CityManager(cityTexture, MAP_WIDTH, MAP_HEIGHT);
             UKrouteManager = new RouteManager(destinationTexture, lineTexture, MAP_WIDTH, MAP_HEIGHT, Simulation.UK, UKcityManager);
-            UKcityPodManager = new CityPodManager(podTexture, SCREEN_WIDTH, SCREEN_HEIGHT, new Vector2(1050, SCREEN_HEIGHT / 2), collabCityTexture);
+            UKcityPodManager = new CityPodManager(podTexture, SCREEN_WIDTH, SCREEN_HEIGHT, new Vector2((SCREEN_WIDTH * 7) / 8, SCREEN_HEIGHT / 2), collabCityTexture);
             UKpodManager = new PodManager(podTexture, destinationTexture, UKrouteManager, UKcityManager.Cities[0].Position, UKKilometerToPixelMultiplier, UKHourToSecondMultiplier, UKcityPodManager);
             UKmetricManager = new MetricManager(UKpodManager, UKpixelReference, UKKilometerReference);
        
@@ -220,7 +220,7 @@ namespace RoutingPrototype
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.LightSkyBlue);
 
             formationManager.Draw(spriteBatch);
             if (currentSimulation == Simulation.UK)
