@@ -16,20 +16,28 @@ namespace RoutingPrototype
         float mKilometresTravelled = 0;         // The total actual distance travelled (regardless of in skein or not)
 
         float mPixelToKilometerConverter;
+        int mJourneysCompleted = 0;
+
+        Vector2 mTopCorner;
+
+        SpriteFont mSpriteFont;
 
         PodManager mPodManager;
 
-        public MetricManager(PodManager podManager, float pixelReference, float kilometerReference)
+        public MetricManager(PodManager podManager, float pixelReference, float kilometerReference, SpriteFont spriteFont, Vector2 referencePoint)
         {
             mPodManager = podManager;
             mPixelToKilometerConverter = pixelReference / kilometerReference;
+            mSpriteFont = spriteFont;
+            mTopCorner = referencePoint;
         }
 
         public void Update(GameTime gameTime)
         {
-            
+            mJourneysCompleted = 0;
             foreach (Pod pod in mPodManager.Pods)
             {
+                mJourneysCompleted += pod.JourneysCompleted;
                 if (pod.newData)
                 {
                     mKilometresSavedBySkeins += (pod.NonSkeinDistanceTravelled - pod.TheoreticalDistanceTravelled - 1.5f) * mPixelToKilometerConverter; //Seems to misjudge a little so -1 essentially corrects this
@@ -45,7 +53,10 @@ namespace RoutingPrototype
 
         public void Draw(SpriteBatch spritebatch)
         {
-
+            spritebatch.Begin();
+            spritebatch.DrawString(mSpriteFont, "Kilometers worth of fuel \nsaved: " + (int)mKilometresSavedBySkeins, mTopCorner + new Vector2(5, 20), Color.Black);
+            spritebatch.DrawString(mSpriteFont, "Journeys completed: " + mJourneysCompleted, mTopCorner + new Vector2(5, 54), Color.Black);
+            spritebatch.End();
         }
 
         public float KilometresSavedBySkeins

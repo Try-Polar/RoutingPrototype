@@ -36,8 +36,8 @@ namespace RoutingPrototype
         {
             mScreenWidth = screenWidth;
             mScreenHeight = screenHeight;
-            mXResolutionScaler = screenWidth / 800;
-            mYResolutionScaler = screenHeight / 600;
+            mXResolutionScaler = (float)screenWidth / 800f;
+            mYResolutionScaler = (float)screenHeight / 600f;
             mMapWidth = (int)(mScreenWidth * 0.75f);
             mMarkerTexture = markerText;
             mLineTexture = lineText;

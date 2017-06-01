@@ -29,6 +29,8 @@ namespace RoutingPrototype
         Texture2D boatBackground;
         Rectangle boatBackgroundRectangle;
 
+        SpriteFont metricFont;
+
         FormationManager formationManager;
         PodManager UKpodManager;
         RouteManager UKrouteManager;
@@ -48,8 +50,8 @@ namespace RoutingPrototype
         LivePlot plot;  // form displaying plot of metrics
         DispatcherTimer dispatcherTimer;    // timer for plotting data every second
 
-        int SCREEN_WIDTH = 800;
-        int SCREEN_HEIGHT = 600;
+        int SCREEN_WIDTH = 1200;
+        int SCREEN_HEIGHT = 900;
         int MAP_WIDTH;
         int MAP_HEIGHT;
 
@@ -127,12 +129,14 @@ namespace RoutingPrototype
             boatBackground = Content.Load<Texture2D>("BoatBackground");
             boatBackgroundRectangle = new Rectangle(0, 0, MAP_WIDTH, MAP_HEIGHT);
 
+            metricFont = Content.Load<SpriteFont>("Metric");
+
             formationManager = new FormationManager(formationPodTexture, new Vector2(SCREEN_WIDTH, SCREEN_HEIGHT));
             UKcityManager = new CityManager(cityTexture, MAP_WIDTH, MAP_HEIGHT);
             UKrouteManager = new RouteManager(destinationTexture, lineTexture, MAP_WIDTH, MAP_HEIGHT, Simulation.UK, UKcityManager);
             UKcityPodManager = new CityPodManager(podTexture, SCREEN_WIDTH, SCREEN_HEIGHT, new Vector2((SCREEN_WIDTH * 7) / 8, SCREEN_HEIGHT / 2), collabCityTexture);
             UKpodManager = new PodManager(podTexture, destinationTexture, UKrouteManager, UKcityManager.Cities[0].Position, UKKilometerToPixelMultiplier, UKHourToSecondMultiplier, UKcityPodManager);
-            UKmetricManager = new MetricManager(UKpodManager, UKpixelReference, UKKilometerReference);
+            UKmetricManager = new MetricManager(UKpodManager, UKpixelReference, UKKilometerReference, metricFont, new Vector2(SCREEN_WIDTH * 0.75f, SCREEN_HEIGHT * 2 / 3));
        
             
             //boatCityManager = new CityManager(cityTexture, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -232,17 +236,20 @@ namespace RoutingPrototype
                 UKpodManager.Draw(spriteBatch);
                 UKrouteManager.Draw(spriteBatch);
                 UKcityPodManager.Draw(spriteBatch);
+                UKmetricManager.Draw(spriteBatch);
             }
             if (currentSimulation == Simulation.Boat)
             {
                 spriteBatch.Begin();
                 spriteBatch.Draw(boatBackground, boatBackgroundRectangle, Color.White);
+                spriteBatch.Draw(cityTexture, new Rectangle((int)boatRouteManager.PortLocation.X, (int)boatRouteManager.PortLocation.Y, cityTexture.Width, cityTexture.Height), Color.White);
                 spriteBatch.End();
                 //boatCityManager.Draw(spriteBatch);
                 boatPodManager.Draw(spriteBatch);
                 boatRouteManager.Draw(spriteBatch);
                 //boatCityPodManager.Draw(spriteBatch);
             }
+            
 
             base.Draw(gameTime);
         }

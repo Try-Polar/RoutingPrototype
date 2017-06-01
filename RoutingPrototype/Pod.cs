@@ -19,6 +19,8 @@ namespace RoutingPrototype
         bool mInFormation = false;
         bool mInLondon = false;
 
+        int mJourneysCompleted = 0;
+
         public Skein Skein;
 
         Color mColor = Color.White;
@@ -121,6 +123,10 @@ namespace RoutingPrototype
                 {
                     mOnFinalApproach = false;
                     currentStatus = STATUS.Free;
+                    if (mJourneyStarted)
+                    {
+                        mJourneysCompleted++;
+                    }
                     mRecentlyFreed = true;
                     mColor = Color.White;
                     if (mCityManager != null)
@@ -499,6 +505,11 @@ namespace RoutingPrototype
         public bool onFinalApproach
         {
             get { return mOnFinalApproach; }
+        }
+
+        public int JourneysCompleted
+        {
+            get { return mJourneysCompleted; }
         }
 
         void colorGreen()

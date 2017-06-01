@@ -121,3 +121,10 @@
 /processorParam:TextureFormat=Color
 /build:BoatBackground.png
 
+#begin Metric.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Metric.spritefont
+
