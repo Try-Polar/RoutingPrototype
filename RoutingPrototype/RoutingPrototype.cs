@@ -248,8 +248,14 @@ namespace RoutingPrototype
         }
 
         private void dispatcherTimer_Tick(object sender, EventArgs eventArgs)
-        {
-            plot.updatePlot(UKmetricManager.SkeinKilometresTravelled, UKmetricManager.NonSkeinKilometresTravelled);
+        { 
+            float distanceTravelled = UKmetricManager.RealDistanceTravelled;
+
+            // Calculate the cost of the journey by converting to miles and using data from report 
+            float nonSkeinCost = (float)(distanceTravelled * 0.621371 * 29.64);     // Using cost of non-skein travelling
+            float skeinCost = (float)(distanceTravelled * 0.621371 * 28.88);     // Using cost of skein travelling
+
+            plot.updatePlot(skeinCost, nonSkeinCost);
         }
     }
 }

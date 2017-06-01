@@ -11,6 +11,8 @@ namespace RoutingPrototype
         public ChartValues<MeasureModel> ChartValuesSkeining { get; set; }
         public ChartValues<MeasureModel> ChartValuesNonSkeining { get; set; }
 
+        private int fontSize = 14;
+
         public LivePlot()
         {
             InitializeComponent();
@@ -42,8 +44,8 @@ namespace RoutingPrototype
             {
                 new LineSeries
                 {
-                    Title = "Kilometres Travelled \r With Skeining",
-                    FontSize = 12,
+                    Title = "Skyline Cost (£) \r With Skeining",
+                    FontSize = fontSize,
                     Foreground = System.Windows.Media.Brushes.White,
                     Values = ChartValuesSkeining,
                     PointGeometrySize = 9,
@@ -51,8 +53,8 @@ namespace RoutingPrototype
                 },
                 new LineSeries
                 {
-                    Title = "Kilometres Travelled \r Without Skeining",
-                    FontSize = 12,
+                    Title = "Skyline Cost (£) \r Without Skeining",
+                    FontSize = fontSize,
                     Foreground = System.Windows.Media.Brushes.White,
                     Values = ChartValuesNonSkeining,
                     PointGeometrySize = 9,
@@ -63,7 +65,7 @@ namespace RoutingPrototype
             cartesianChart1.AxisX.Add(new Axis
             {
                 Title = "Time",
-                FontSize = 12,
+                FontSize = fontSize,
                 Foreground = System.Windows.Media.Brushes.White,
                 DisableAnimations = true,
                 LabelFormatter = value => new System.DateTime((long)value).ToString("mm:ss"),
@@ -75,15 +77,16 @@ namespace RoutingPrototype
 
             cartesianChart1.AxisY.Add(new Axis
             {
-                Title = "Kilometres Travelled (km)",
-                FontSize = 12,
+                Title = "Skyline Cost (£)",
+                FontSize = fontSize,
                 Foreground = System.Windows.Media.Brushes.White,
-                MinValue = 0
+                
             });
 
             cartesianChart1.LegendLocation = LegendLocation.Right;
             cartesianChart1.DefaultLegend.Foreground = System.Windows.Media.Brushes.White;
             SetAxisLimits(System.DateTime.Now);
+
 
         }
 
@@ -110,7 +113,12 @@ namespace RoutingPrototype
             });
 
             SetAxisLimits(now);
+
+            //lets only use the last 10 values
+            if (ChartValuesSkeining.Count > 10) ChartValuesSkeining.RemoveAt(0);
+            if (ChartValuesNonSkeining.Count > 10) ChartValuesNonSkeining.RemoveAt(0);
+
         }
-    
+
     }
 }

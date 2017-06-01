@@ -26,7 +26,8 @@ namespace RoutingPrototype
         float mColorSwitchInterval = 0.1f;
         float mColorswitchTimer = 0;
 
-        float mDistTravelledOnJourney;
+        float mTheoreticalDistTravelledOnJourney;   // The theoretical distance travelled (will be smaller than actual distance travelled because of skein savings)
+        float mRealDistTravelledOnJourney;          // The actual distance travelled (regadless of whether in skein or not)
         float mMaxDistanceTravelled;
 
         public bool newData = false;
@@ -280,12 +281,14 @@ namespace RoutingPrototype
                 if (!inFormation)
                 {
                     mEnergy -= distanceMoved.Length() / mDistMulti;
-                    mDistTravelledOnJourney += distanceMoved.Length();
+                    mTheoreticalDistTravelledOnJourney += distanceMoved.Length();
+                    mRealDistTravelledOnJourney += distanceMoved.Length();
                 }
                 else
                 {
                     mEnergy -= distanceMoved.Length() * mSkeinBonusMultiplier / mDistMulti;
-                    mDistTravelledOnJourney += distanceMoved.Length() * mSkeinBonusMultiplier;
+                    mTheoreticalDistTravelledOnJourney += distanceMoved.Length() * mSkeinBonusMultiplier;
+                    mRealDistTravelledOnJourney += distanceMoved.Length();
                 }
                 if (mEnergy < 0)
                     mEnergy = 0;
@@ -394,14 +397,15 @@ namespace RoutingPrototype
         void startJourney(Vector2 endPoint)
         {
 
-            mDistTravelledOnJourney = 0;
+            mTheoreticalDistTravelledOnJourney = 0;
+            mRealDistTravelledOnJourney = 0;
             mMaxDistanceTravelled = (endPoint - Position).Length();
         }
 
         void journeyEnded()
         {
             newData = true;
-            //mTotalDistTravelledOnJourney = mDistTravelledOnJourney * mDistMulti;
+            //mTotalDistTravelledOnJourney = mTheoreticalDistTravelledOnJourney * mDistMulti;
             //mTotalMaxDistanceTravelled = mMaxDistanceTravelled * mDistMulti;
         }
 
@@ -453,9 +457,14 @@ namespace RoutingPrototype
             get { return mCurrentVector; }
         }
 
-        public float ActualDistanceTravelled
+        public float TheoreticalDistanceTravelled
         {
-            get { return mDistTravelledOnJourney; }
+            get { return mTheoreticalDistTravelledOnJourney; }
+        }
+
+        public float RealDistanceTravelled
+        {
+            get { return mRealDistTravelledOnJourney; }
         }
 
         public float NonSkeinDistanceTravelled

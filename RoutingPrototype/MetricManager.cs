@@ -10,9 +10,11 @@ namespace RoutingPrototype
 {
     class MetricManager : IUpdateDraw
     {
-        float mKilometresSavedBySkeins = 0;
-        float mKilometresNonSkeinTravelled = 0;
-        float mKilometresSkeinTravelled = 0;
+        float mKilometresSavedBySkeins = 0;     
+        float mKilometresNonSkeinTravelled = 0; // The actual distance travelled not in a skein
+        float mKilometresSkeinTravelled = 0;    // The theoretical (smaller) distance travelled in skeins
+        float mKilometresTravelled = 0;         // The total actual distance travelled (regardless of in skein or not)
+
         float mPixelToKilometerConverter;
 
         PodManager mPodManager;
@@ -30,9 +32,11 @@ namespace RoutingPrototype
             {
                 if (pod.newData)
                 {
-                    mKilometresSavedBySkeins += (pod.NonSkeinDistanceTravelled - pod.ActualDistanceTravelled - 1.5f) * mPixelToKilometerConverter; //Seems to misjudge a little so -1 essentially corrects this
+                    mKilometresSavedBySkeins += (pod.NonSkeinDistanceTravelled - pod.TheoreticalDistanceTravelled - 1.5f) * mPixelToKilometerConverter; //Seems to misjudge a little so -1 essentially corrects this
                     mKilometresNonSkeinTravelled += (pod.NonSkeinDistanceTravelled - 1.5f) * mPixelToKilometerConverter;
-                    mKilometresSkeinTravelled += (pod.ActualDistanceTravelled) * mPixelToKilometerConverter;
+                    mKilometresSkeinTravelled += (pod.TheoreticalDistanceTravelled - 1.5f) * mPixelToKilometerConverter;
+                    mKilometresTravelled += (pod.RealDistanceTravelled - 1.5f) * mPixelToKilometerConverter;
+
                     pod.newData = false;
                 }
             }
@@ -57,6 +61,11 @@ namespace RoutingPrototype
         public float SkeinKilometresTravelled
         {
             get { return mKilometresSkeinTravelled; }
+        }
+
+        public float RealDistanceTravelled
+        {
+            get { return mKilometresTravelled; }
         }
     }
 }
