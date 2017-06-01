@@ -62,6 +62,7 @@ namespace RoutingPrototype
         CityManager mCityManager;
         CityPodManager mCityPodManager;
         Vector2 mLondonLocation;
+        Vector2 mStartLocation;
 
         Random rnd;
         STATUS currentStatus = STATUS.Free;
@@ -70,6 +71,7 @@ namespace RoutingPrototype
         {
             id = podId;
             rnd = new Random(randomSeed);
+            mStartLocation = initialPosition;
             maxVelocity = 1;
             mGoal = initialPosition;
             mCityManager = cityManager;
@@ -176,10 +178,10 @@ namespace RoutingPrototype
                     mGoal = mCurrentRoute.DropOff;
                     mTarget = mGoal;
                 }
-                
-                if (((distanceTo(mGoal) + 10))  > distanceAvailable() && !mRecharging) //Maybe should be target NOT GOAL
-                {
-                    if (mCityManager != null)
+
+                if (mCityManager != null)
+                {   //UK SIM
+                    if (((distanceTo(mGoal) + 10)) > distanceAvailable() && !mRecharging) //Maybe should be target NOT GOAL
                     {
                         City chargingPoint = findBestChargingPoint();
                         if (chargingPoint != null)
@@ -188,12 +190,16 @@ namespace RoutingPrototype
                             mRecharging = false;
                             mGoal = chargingPoint.Position;
                         }
+                        
                     }
-                    else
+                }
+                else
+                {   //BOAT SIM
+                    if (((distanceTo(mGoal) + 10)) * 2 > distanceAvailable() && !mRecharging) //Maybe should be target NOT GOAL
                     {
                         mGoingToCharge = true;
                         mRecharging = false;
-                        mGoal = Position;
+                        mGoal = mStartLocation;
                     }
                 }
                 mTarget = mGoal; //Might seem redundant, to do this right after setting mGoal, but mTarget is likely to change while mGoal will not

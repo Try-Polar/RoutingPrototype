@@ -12,6 +12,8 @@ namespace RoutingPrototype
     {
         int mScreenWidth;
         int mScreenHeight;
+        float mXResolutionScaler;
+        float mYResolutionScaler;
         int mMapWidth;
 
         float mSpawnInterval = 0.05f;
@@ -34,6 +36,8 @@ namespace RoutingPrototype
         {
             mScreenWidth = screenWidth;
             mScreenHeight = screenHeight;
+            mXResolutionScaler = screenWidth / 800;
+            mYResolutionScaler = screenHeight / 600;
             mMapWidth = (int)(mScreenWidth * 0.75f);
             mMarkerTexture = markerText;
             mLineTexture = lineText;
@@ -43,6 +47,18 @@ namespace RoutingPrototype
             this.cityManager = cityManager;
             mPortLocation = new Vector2(mScreenWidth / 6, screenHeight / 2);
             simulation = sim;
+
+            for (int i = 0; i < 50; i++)
+            {
+                if (simulation == Simulation.UK)
+                {
+                    mUnassignedRoutes.Add(generateRealisticRoute());
+                }
+                if (simulation == Simulation.Boat)
+                {
+                    mUnassignedRoutes.Add(generateRouteForBoatSim());
+                }
+            }
             //For testing purposes only---
             //mUnassignedRoutes.Add(new Route(mMarkerTexture, mLineTexture, new Vector2(615, 488), new Vector2(727, 728)));
             //mUnassignedRoutes.Add(new Route(mMarkerTexture, mLineTexture, new Vector2(589, 522), new Vector2(727, 728)));
@@ -124,17 +140,17 @@ namespace RoutingPrototype
 
             int y = rnd.Next(0, mScreenHeight);
             int x = 0;
-            if (y < 50)
+            if (y < 50 * mYResolutionScaler)
             {
-                x = rnd.Next(225, mMapWidth);
+                x = rnd.Next((int)(225 * mXResolutionScaler), mMapWidth);
             }
-            else if (y >= 50 && y < 200)
+            else if (y >= 50 * mYResolutionScaler && y < 200 * mYResolutionScaler)
             {
-                x = rnd.Next(300, mMapWidth);
+                x = rnd.Next((int)(300 * mXResolutionScaler), mMapWidth);
             }
-            else if ( y >= 200)
+            else if ( y >= 200 * mYResolutionScaler)
             {
-                x = rnd.Next(240, mMapWidth);
+                x = rnd.Next((int)(240 * mXResolutionScaler), mMapWidth);
             }
             dropOffLoc.X = x;
             dropOffLoc.Y = y;
@@ -167,6 +183,12 @@ namespace RoutingPrototype
         public CityManager CityManager
         {
             get { return cityManager; }
+        }
+        
+
+        public Vector2 PortLocation
+        {
+            get { return mPortLocation; }
         }
 
         //This will most likely be redundant but oh well

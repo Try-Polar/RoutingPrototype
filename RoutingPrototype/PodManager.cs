@@ -48,9 +48,15 @@ namespace RoutingPrototype
             //----------------------------
 
             //establish some number of pods
-            for (int i = 0; i < initialNumberOfPods; i++)
+            if (mCityPodManger != null)
             {
-                mPods.Add(new Pod(mPodTexture, mDestinationTexture, startLocation, routeManager.CityManager, rnd.Next(), currentId++, mDistMulti, mTimeMulti, cityPodManager));
+                for (int i = 0; i < initialNumberOfPods; i++)
+                    mPods.Add(new Pod(mPodTexture, mDestinationTexture, startLocation, routeManager.CityManager, rnd.Next(), currentId++, mDistMulti, mTimeMulti, cityPodManager));
+            }
+            else
+            {
+                for (int i = 0; i < initialNumberOfPods; i++)
+                    mPods.Add(new Pod(mPodTexture, mDestinationTexture, mRouteManager.PortLocation, routeManager.CityManager, rnd.Next(), currentId++, mDistMulti, mTimeMulti, cityPodManager));
             }
         }
 
@@ -68,7 +74,7 @@ namespace RoutingPrototype
                             {
                                 //Maybe ddd a check to make sure they're not already assigned to the same skein     
                                 //Distance Check
-                                if ((otherPod.Position - pod.Position).Length() < 20)
+                                if ((otherPod.Position - pod.Position).Length() < 40)
                                 {
                                     //Similar Route Check (order of this and distance check could be changed)                  
                                     float angle = angleBetweenVectors(pod.CurrentVector, otherPod.CurrentVector); //possibly check if they are in skein and if so use current skein vector
