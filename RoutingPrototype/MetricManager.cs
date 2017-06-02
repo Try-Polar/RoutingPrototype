@@ -78,5 +78,11 @@ namespace RoutingPrototype
         {
             get { return mKilometresTravelled; }
         }
+
+        public int JourneysCompleted
+        {
+            get { return mJourneysCompleted; }
+            set { mJourneysCompleted = value; }
+        }
     }
 }

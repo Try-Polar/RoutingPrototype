@@ -44,12 +44,12 @@ namespace RoutingPrototype
         float mEnergy = 300;
         float mMinimumEnergyThreshold = 5;
         float mSufficientChargeThreshold = 295;
-        float mRechargeRate = 120;
+        float mRechargeRate;
         bool mRecharging = false;
         float mDistMulti;
         float maxDistance;
-        float mSkeinBonusMultiplier = 0.85f;
-        float mChanceToLandInCity = 0.15f;
+        float mSkeinBonusMultiplier = 0.795f;
+        float mChanceToLandInCity = 0.05f;
 
         int id;
 
@@ -81,6 +81,7 @@ namespace RoutingPrototype
             maxDistance = 300 / mDistMulti;
             VELOCITY = 300 * distMulti / timeMulti;
             mDistMulti = distMulti;
+            mRechargeRate = 300 / timeMulti;
             try
             {
                 mLondonLocation = cityManager.findLondon();
@@ -194,6 +195,7 @@ namespace RoutingPrototype
                         {
                             mGoingToCharge = true;
                             mRecharging = false;
+                            mColor = Color.White;
                             mGoal = chargingPoint.Position;
                         }
                         
@@ -201,10 +203,11 @@ namespace RoutingPrototype
                 }
                 else
                 {   //BOAT SIM
-                    if (((distanceTo(mGoal) + 10)) * 2 > distanceAvailable() && !mRecharging) //Maybe should be target NOT GOAL
+                    if (((distanceTo(mGoal) + 10)) * 2.2f > distanceAvailable() && !mRecharging) //Maybe should be target NOT GOAL
                     {
                         mGoingToCharge = true;
                         mRecharging = false;
+                        mColor = Color.White;
                         mGoal = mStartLocation;
                     }
                 }
@@ -268,12 +271,7 @@ namespace RoutingPrototype
                     {
                         //Leave Skein
                         mOnFinalApproach = true;
-                        this.Skein.remove(this);
-                        this.Skein = null;
-                        mInSkein = false;
-                        mInFormation = false;
-                        mColor = Color.White;
-                        mTarget = mGoal;
+                        leaveSkein();
                     }
                     
                 }
@@ -307,6 +305,8 @@ namespace RoutingPrototype
             }
             else //Recharge
             {
+                if (inSkein)
+                    leaveSkein();
                 mEnergy += (float)gameTime.ElapsedGameTime.TotalSeconds * mRechargeRate;
                 if (mEnergy > 300)
                     mEnergy = 300;
@@ -349,6 +349,17 @@ namespace RoutingPrototype
             inSkein = false;
             inFormation = false;
             this.Skein = null;
+            mColor = Color.White;
+            mTarget = mGoal;
+        }
+
+        void leaveSkein()
+        {
+
+            this.Skein.remove(this);
+            this.Skein = null;
+            mInSkein = false;
+            mInFormation = false;
             mColor = Color.White;
             mTarget = mGoal;
         }
@@ -474,6 +485,11 @@ namespace RoutingPrototype
             get { return mTheoreticalDistTravelledOnJourney; }
         }
 
+        public bool Recharging
+        {
+            get { return mRecharging; }
+        }
+
         public float RealDistanceTravelled
         {
             get { return mRealDistTravelledOnJourney; }
@@ -510,6 +526,7 @@ namespace RoutingPrototype
         public int JourneysCompleted
         {
             get { return mJourneysCompleted; }
+            set { mJourneysCompleted = value; }
         }
 
         void colorGreen()

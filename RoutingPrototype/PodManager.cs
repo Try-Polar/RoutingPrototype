@@ -28,6 +28,7 @@ namespace RoutingPrototype
         float mDistMulti;
         float mTimeMulti;
 
+        bool mCreatingSkeins;
 
         public PodManager(Texture2D podText, Texture2D destinationText, RouteManager routeManager, Vector2 startLocation, float distMulti, float timeMulti, CityPodManager cityPodManager = null)
         {
@@ -50,11 +51,13 @@ namespace RoutingPrototype
             //establish some number of pods
             if (mCityPodManger != null)
             {
+                mCreatingSkeins = false;
                 for (int i = 0; i < initialNumberOfPods; i++)
                     mPods.Add(new Pod(mPodTexture, mDestinationTexture, startLocation, routeManager.CityManager, rnd.Next(), currentId++, mDistMulti, mTimeMulti, cityPodManager));
             }
             else
             {
+                mCreatingSkeins = true;
                 for (int i = 0; i < initialNumberOfPods; i++)
                     mPods.Add(new Pod(mPodTexture, mDestinationTexture, mRouteManager.PortLocation, routeManager.CityManager, rnd.Next(), currentId++, mDistMulti, mTimeMulti, cityPodManager));
             }
@@ -64,11 +67,11 @@ namespace RoutingPrototype
         {
             foreach (Pod pod in mPods)
             {
-                if (!pod.onFinalApproach && pod.Velocity.Length() > 0.00001f && !pod.isInCity())
+                if (!pod.onFinalApproach && pod.Velocity.Length() > 0.00001f && !pod.isInCity() && !pod.Recharging)
                 {
                     foreach (Pod otherPod in mPods)
                     {
-                        if (!otherPod.onFinalApproach && otherPod.Velocity.Length() > 0.00001f && !otherPod.isInCity())
+                        if (!otherPod.onFinalApproach && otherPod.Velocity.Length() > 0.00001f && !otherPod.isInCity() && !otherPod.Recharging)
                         {
                             if (otherPod != pod)
                             {
@@ -124,7 +127,8 @@ namespace RoutingPrototype
 
         public void Update(GameTime gameTime)
         {
-            skeinAssignment();
+            if (mCreatingSkeins)
+                skeinAssignment();
             //choose pod to assign to route (use closest?)
             //When route is completed by pod delete route from route list   
             if (mRouteManager.UnassignedRoutes.Count > 0)
@@ -181,12 +185,27 @@ namespace RoutingPrototype
             }
         }
 
+        public void clearJourneysCompleted()
+        {
+            foreach (Pod pod in mPods)
+            {
+                pod.JourneysCompleted = 0;
+            }
+        }
+
         float angleBetweenVectors(Vector2 a, Vector2 b)
         {
             a = a / a.Length();
             b = b / b.Length();
             return (float)Math.Acos(Vector2.Dot(a, b));
         }
+
+        public bool CreatingSkeins
+        {
+            get { return mCreatingSkeins; }
+            set { mCreatingSkeins = value; }
+        }
+
 
         public List<Pod> Pods
         {

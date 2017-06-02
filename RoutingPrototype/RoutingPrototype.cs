@@ -50,8 +50,8 @@ namespace RoutingPrototype
         LivePlot plot;  // form displaying plot of metrics
         DispatcherTimer dispatcherTimer;    // timer for plotting data every second
 
-        int SCREEN_WIDTH = 1200;
-        int SCREEN_HEIGHT = 900;
+        int SCREEN_WIDTH = 800;
+        int SCREEN_HEIGHT = 600;
         int MAP_WIDTH;
         int MAP_HEIGHT;
 
@@ -87,7 +87,7 @@ namespace RoutingPrototype
             UKKilometerToPixelMultiplier = ((UKpixelReference * ((float)SCREEN_WIDTH / (float)1200)) / UKKilometerReference);
             UKHourToSecondMultiplier = (120 / 24);
             boatKilometerToPixelMultiplier = ((boatPixelReference * ((float)SCREEN_HEIGHT / (float)1200)) / boatKilometerReference);
-            boatHourToSecondMultiplier = (1200 / 24);
+            boatHourToSecondMultiplier = (1800 / 24);
 
             this.IsMouseVisible = true;
 
@@ -213,6 +213,15 @@ namespace RoutingPrototype
             {
                 currentSimulation = Simulation.Boat;
             }
+            if (newState.IsKeyUp(Keys.Space) && oldState.IsKeyDown(Keys.Space))
+            {
+                UKpodManager.clearJourneysCompleted();
+                if (UKpodManager.CreatingSkeins)
+                    UKpodManager.CreatingSkeins = false;
+                else
+                    UKpodManager.CreatingSkeins = true;
+            }
+
 
             oldState = newState;
             base.Update(gameTime);
@@ -245,8 +254,8 @@ namespace RoutingPrototype
                 spriteBatch.Draw(cityTexture, new Rectangle((int)boatRouteManager.PortLocation.X, (int)boatRouteManager.PortLocation.Y, cityTexture.Width, cityTexture.Height), Color.White);
                 spriteBatch.End();
                 //boatCityManager.Draw(spriteBatch);
-                boatPodManager.Draw(spriteBatch);
                 boatRouteManager.Draw(spriteBatch);
+                boatPodManager.Draw(spriteBatch);
                 //boatCityPodManager.Draw(spriteBatch);
             }
             

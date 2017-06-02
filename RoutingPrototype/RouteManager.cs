@@ -45,7 +45,7 @@ namespace RoutingPrototype
             mUnassignedRoutes = new List<Route>();
             mAssignedRoutes = new List<Route>();
             this.cityManager = cityManager;
-            mPortLocation = new Vector2(mScreenWidth / 6, screenHeight / 2);
+            mPortLocation = new Vector2(mScreenWidth / 12, mScreenHeight / 2);
             simulation = sim;
 
             for (int i = 0; i < 50; i++)
@@ -142,15 +142,15 @@ namespace RoutingPrototype
             int x = 0;
             if (y < 50 * mYResolutionScaler)
             {
-                x = rnd.Next((int)(225 * mXResolutionScaler), mMapWidth);
+                x = rnd.Next((int)(225 * mXResolutionScaler), mMapWidth - 10);
             }
             else if (y >= 50 * mYResolutionScaler && y < 200 * mYResolutionScaler)
             {
-                x = rnd.Next((int)(300 * mXResolutionScaler), mMapWidth);
+                x = rnd.Next((int)(300 * mXResolutionScaler), mMapWidth - 10);
             }
             else if ( y >= 200 * mYResolutionScaler)
             {
-                x = rnd.Next((int)(240 * mXResolutionScaler), mMapWidth);
+                x = rnd.Next((int)(240 * mXResolutionScaler), mMapWidth - 10);
             }
             dropOffLoc.X = x;
             dropOffLoc.Y = y;
@@ -194,13 +194,16 @@ namespace RoutingPrototype
         //This will most likely be redundant but oh well
         public void Draw(SpriteBatch spriteBatch)
         {
-            foreach(Route route in mUnassignedRoutes)
+            if (simulation == Simulation.Boat)
             {
-                route.Draw(spriteBatch);
-            }
-            foreach(Route route in mAssignedRoutes)
-            {
-                route.Draw(spriteBatch);
+                /*foreach (Route route in mUnassignedRoutes)
+                {
+                    route.Draw(spriteBatch);
+                }*/
+                foreach (Route route in mAssignedRoutes)
+                {
+                    route.Draw(spriteBatch);
+                }
             }
         }
     }
