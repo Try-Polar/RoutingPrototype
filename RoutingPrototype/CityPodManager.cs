@@ -39,7 +39,7 @@ namespace RoutingPrototype
 
         public void AddPod(Pod pod)
         {
-            mPods.Add(new CityPod(mPodTexture, new Vector2(mLeftBoundary + 10, mUpperBoundary + 10), mScreenWidth, mCityPosition, new Vector2(rnd.Next(-5, 5), rnd.Next(-5, 5)), rnd.Next(-5,5), rnd.Next(-5, 5), pod, mCityRadius));
+            mPods.Add(new CityPod(mPodTexture, new Vector2(mLeftBoundary + 10, mUpperBoundary + rnd.Next(0, mScreenHeight/3)), mScreenWidth, mCityPosition, new Vector2(rnd.Next(-5, 5), rnd.Next(-5, 5)), rnd.Next(-5,5), rnd.Next(-5, 5), pod, mCityRadius));
         }
 
         public void Update(GameTime gameTime)

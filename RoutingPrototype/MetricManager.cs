@@ -40,7 +40,9 @@ namespace RoutingPrototype
                 mJourneysCompleted += pod.JourneysCompleted;
                 if (pod.newData)
                 {
-                    mKilometresSavedBySkeins += (pod.NonSkeinDistanceTravelled - pod.TheoreticalDistanceTravelled - 1.5f) * mPixelToKilometerConverter; //Seems to misjudge a little so -1 essentially corrects this
+                    float val = (pod.NonSkeinDistanceTravelled - pod.TheoreticalDistanceTravelled) * mPixelToKilometerConverter;
+                    if (val > 3.3f)
+                        mKilometresSavedBySkeins += (pod.NonSkeinDistanceTravelled - pod.TheoreticalDistanceTravelled) * mPixelToKilometerConverter; //Seems to misjudge a little so -1 essentially corrects this
                     mKilometresNonSkeinTravelled += (pod.NonSkeinDistanceTravelled - 1.5f) * mPixelToKilometerConverter;
                     mKilometresSkeinTravelled += (pod.TheoreticalDistanceTravelled - 1.5f) * mPixelToKilometerConverter;
                     mKilometresTravelled += (pod.RealDistanceTravelled - 1.5f) * mPixelToKilometerConverter;
