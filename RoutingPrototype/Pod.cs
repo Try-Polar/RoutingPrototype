@@ -14,6 +14,8 @@ namespace RoutingPrototype
     {        
         Route mCurrentRoute;
 
+        const float PI = 3.14159265359f;
+
         bool mInSkein = false;
         bool mIsLeader = false;
         bool mInFormation = false;
@@ -136,7 +138,7 @@ namespace RoutingPrototype
                         {
                             //"Land" in city
                             currentStatus = STATUS.inCity;
-                            if (Vector2.Distance(Position, mLondonLocation) < 2)
+                            if (Vector2.Distance(Position, mLondonLocation) < 10)
                             {
                                 mInLondon = true;
                             }
@@ -196,7 +198,7 @@ namespace RoutingPrototype
                             mGoingToCharge = true;
                             mRecharging = false;
                             mColor = Color.White;
-                            mGoal = chargingPoint.Position;
+                            mGoal = chargingPoint.Position + chargingPoint.Offset;
                         }
                         
                     }
@@ -437,8 +439,14 @@ namespace RoutingPrototype
 
             //Check this works with multiple instances
             spriteBatch.Begin();
-            spriteBatch.Draw(this.Texture, this.Rect, mColor);
+            //spriteBatch.Draw(this.Texture, this.Rect, mColor);
+            spriteBatch.Draw(this.Texture, this.Position, new Rectangle(0, 0, Texture.Width, Texture.Height), mColor, getCurrentAngle(), this.Origin(), 1, SpriteEffects.None, 0);
             spriteBatch.End();
+        }
+
+        float getCurrentAngle()
+        {
+            return (float)Math.Atan2(Velocity.Y, Velocity.X) + (PI / 2);
         }
 
         public bool RecentlyFreed

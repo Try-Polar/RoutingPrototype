@@ -28,6 +28,8 @@ namespace RoutingPrototype
         Rectangle UKBackgroundRectangle;
         Texture2D boatBackground;
         Rectangle boatBackgroundRectangle;
+        Texture2D skyBackground;
+        Rectangle skyBackgroundRectangle;
 
         SpriteFont metricFont;
 
@@ -118,8 +120,8 @@ namespace RoutingPrototype
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            podTexture = Content.Load<Texture2D>("Pod");
-            formationPodTexture = Content.Load<Texture2D>("FormationPod");
+            podTexture = Content.Load<Texture2D>("LiliumJetRescaled");
+            formationPodTexture = Content.Load<Texture2D>("LiliumJetRescaled");
             destinationTexture = Content.Load<Texture2D>("Destination");
             lineTexture = Content.Load<Texture2D>("Line");
             cityTexture = Content.Load<Texture2D>("City");
@@ -128,6 +130,8 @@ namespace RoutingPrototype
             UKBackgroundRectangle = new Rectangle(0, 0, MAP_WIDTH, MAP_HEIGHT);
             boatBackground = Content.Load<Texture2D>("BoatBackground");
             boatBackgroundRectangle = new Rectangle(0, 0, MAP_WIDTH, MAP_HEIGHT);
+            skyBackground = Content.Load<Texture2D>("SkyBackground");
+            skyBackgroundRectangle = new Rectangle((int)((float)SCREEN_WIDTH * 0.75f), (int)((float)SCREEN_HEIGHT / 3), 1000, 1000);
 
             metricFont = Content.Load<SpriteFont>("Metric");
 
@@ -236,6 +240,9 @@ namespace RoutingPrototype
             GraphicsDevice.Clear(Color.LightSkyBlue);
 
             formationManager.Draw(spriteBatch);
+            spriteBatch.Begin();
+            spriteBatch.Draw(skyBackground, skyBackgroundRectangle, Color.White);
+            spriteBatch.End();
             if (currentSimulation == Simulation.UK)
             {
                 spriteBatch.Begin();

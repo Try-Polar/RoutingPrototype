@@ -109,7 +109,7 @@ namespace RoutingPrototype
 
                 if (value <= 0)
                 {
-                    pickUpLocation = city.Position;
+                    pickUpLocation = city.Position + city.Offset;
                     a = city.Name;
                     break;
                 }
@@ -123,7 +123,7 @@ namespace RoutingPrototype
                     value -= city.Weighting;
                     if (value <= 0)
                     {
-                        dropOffLocation = city.Position;
+                        dropOffLocation = city.Position + city.Offset;
                         b = city.Name;
                         break;
                     }

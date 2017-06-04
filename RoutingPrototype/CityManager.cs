@@ -33,7 +33,7 @@ namespace RoutingPrototype
 
         void setupCities()
         {
-            mCities.Add(new City(cityTexture, new Vector2(711 * mWidthScaler, 691 * mHeightScaler), "London", 40));
+            mCities.Add(new City(cityTexture, new Vector2(711 * mWidthScaler, 691 * mHeightScaler), "London", 50));
             mCities.Add(new City(cityTexture, new Vector2(347 * mWidthScaler, 180 * mHeightScaler), "Glasgow", 5));
             mCities.Add(new City(cityTexture, new Vector2(400 * mWidthScaler, 123 * mHeightScaler), "Edinburgh", 10));
             mCities.Add(new City(cityTexture, new Vector2(586 * mWidthScaler, 266 * mHeightScaler), "Newcastle", 5));

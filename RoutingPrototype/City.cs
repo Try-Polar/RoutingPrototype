@@ -14,11 +14,15 @@ namespace RoutingPrototype
 
         int mWeighting;
 
+        Vector2 mOffset;
+
         public City(Texture2D texture, Vector2 initialPosition, string cityName, int weighting) : base(texture, initialPosition)
         {
             mName = cityName;
             mWeighting = weighting;
             this.updateRectanglePos();
+            mOffset.X = texture.Width / 2;
+            mOffset.Y = texture.Height / 2;
         }
 
         public string Name
@@ -31,7 +35,10 @@ namespace RoutingPrototype
             get { return mWeighting; }
         }
 
-
+        public Vector2 Offset
+        {
+            get { return mOffset; }
+        }
 
         public void Update(GameTime gameTime)
         {

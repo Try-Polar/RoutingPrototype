@@ -11,6 +11,8 @@ namespace RoutingPrototype
     class CityPod : MovingEntity, IUpdateDraw
     {
 
+        const float PI = 3.14159265359f;
+
         enum STATUS { landing, centering, leaving, takingOff}
         STATUS mCurrentStatus = STATUS.landing;
         bool mHasLanded = false;
@@ -99,8 +101,14 @@ namespace RoutingPrototype
         public void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Begin();
-            spriteBatch.Draw(Texture, Rect, Color.White);
+            //spriteBatch.Draw(Texture, Rect, Color.White);
+            spriteBatch.Draw(this.Texture, this.Position, new Rectangle(0, 0, Texture.Width, Texture.Height), Color.White, getCurrentAngle(), this.Origin(), 1, SpriteEffects.None, 0);
             spriteBatch.End();
+        }
+
+        float getCurrentAngle()
+        {
+            return (float)Math.Atan2(Velocity.Y, Velocity.X) + (PI / 2);
         }
 
         public Pod Pod

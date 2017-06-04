@@ -47,6 +47,15 @@ namespace RoutingPrototype
             mRectangle.Height = height;
         }
 
+        public Vector2 Origin()
+        {
+            Vector2 origin;
+            origin.X = Rect.Width / 2 ;
+            origin.Y = Rect.Height / 2;
+            return origin;
+            
+        }
+
         public void setRectanglePos(Vector2 pos)
         {
             mRectangle.X = (int)pos.X;
