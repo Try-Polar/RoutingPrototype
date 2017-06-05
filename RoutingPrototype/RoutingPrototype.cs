@@ -276,9 +276,9 @@ namespace RoutingPrototype
 
             // Calculate the cost of the journey by converting to miles and using data from report 
             float nonSkeinCost = (float)(distanceTravelled * 0.621371 * 29.64);     // Using cost of non-skein travelling
-            float skeinCost = (float)(distanceTravelled * 0.621371 * 28.88);     // Using cost of skein travelling
-
-            plot.updatePlot(skeinCost, nonSkeinCost);
+            float worstSkeinCost = (float)(distanceTravelled * 0.621371 * 28.88);     // Using cost of skein travelling (worst case)
+            float bestSkeinCost = (float)(distanceTravelled * 0.621371 * 27.80);     // Using cost of skein travelling (best case)
+            plot.updatePlot(UKpodManager.CreatingSkeins, worstSkeinCost, bestSkeinCost, nonSkeinCost);
         }
     }
 }

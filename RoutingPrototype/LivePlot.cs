@@ -3,19 +3,32 @@ using System.Windows.Forms;
 using LiveCharts;
 using LiveCharts.Configurations;
 using LiveCharts.Wpf;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace RoutingPrototype
 {
     public partial class LivePlot : Form
     {
-        public ChartValues<MeasureModel> ChartValuesSkeining { get; set; }
+        public ChartValues<MeasureModel> ChartValuesWorstSkeining { get; set; }
+        public ChartValues<MeasureModel> ChartValuesBestSkeining { get; set; }
         public ChartValues<MeasureModel> ChartValuesNonSkeining { get; set; }
 
         private int fontSize = 14;
 
+        private Queue<float> worstSkeinCostFiveSecs; // Worst forecast skein cost values past 5 seconds
+        private Queue<float> bestSkeinCostFiveSecs; // Best forecast skein cost values past 5 seconds
+        private Queue<float> nonSkeinCostFiveSecs; // Non skein cost values past 5 seconds
+
         public LivePlot()
         {
             InitializeComponent();
+
+            // Populate total skien cost in the past 5 seconds queues 
+            List<float> list = new List<float> {0,0,0,0,0};
+            worstSkeinCostFiveSecs = new Queue<float>(list);
+            bestSkeinCostFiveSecs = new Queue<float>(list);
+            nonSkeinCostFiveSecs = new Queue<float>(list);
 
             // Shamelessly copy and pasted from: https://lvcharts.net/App/examples/v1/wf/Constant%20Changes
 
@@ -37,28 +50,43 @@ namespace RoutingPrototype
             Charting.For<MeasureModel>(mapper);
 
             //the ChartValues property will store our values array
-            ChartValuesSkeining = new ChartValues<MeasureModel>();
+            ChartValuesWorstSkeining = new ChartValues<MeasureModel>();
+            ChartValuesBestSkeining = new ChartValues<MeasureModel>();
             ChartValuesNonSkeining = new ChartValues<MeasureModel>();
 
             cartesianChart1.Series = new SeriesCollection
             {
                 new LineSeries
                 {
-                    Title = "Skyline Cost (£) \r With Skeining",
+                    Title = "Worst Case Skyline Cost (£) \r With Skeining (past 2 hours)",
                     FontSize = fontSize,
                     Foreground = System.Windows.Media.Brushes.White,
-                    Values = ChartValuesSkeining,
+                    Values = ChartValuesWorstSkeining,
                     PointGeometrySize = 9,
-                    StrokeThickness = 4
+                    StrokeThickness = 4,
+                    Stroke = System.Windows.Media.Brushes.Blue
                 },
+
                 new LineSeries
                 {
-                    Title = "Skyline Cost (£) \r Without Skeining",
+                    Title = "Best Case Skyline Cost (£) \r With Skeining (past 2 hours)",
+                    FontSize = fontSize,
+                    Foreground = System.Windows.Media.Brushes.White,
+                    Values = ChartValuesBestSkeining,
+                    PointGeometrySize = 9,
+                    StrokeThickness = 4,
+                    Stroke = System.Windows.Media.Brushes.Green
+                },
+
+                new LineSeries
+                {
+                    Title = "Skyline Cost (£) \r Without Skeining (past 2 hours)",
                     FontSize = fontSize,
                     Foreground = System.Windows.Media.Brushes.White,
                     Values = ChartValuesNonSkeining,
                     PointGeometrySize = 9,
-                    StrokeThickness = 4
+                    StrokeThickness = 4,
+                    Stroke = System.Windows.Media.Brushes.Red
                 },
             };
 
@@ -77,7 +105,7 @@ namespace RoutingPrototype
 
             cartesianChart1.AxisY.Add(new Axis
             {
-                Title = "Skyline Cost (£)",
+                Title = "Skyline Cost (£) for past 2 hours",
                 FontSize = fontSize,
                 Foreground = System.Windows.Media.Brushes.White,
                 
@@ -96,26 +124,47 @@ namespace RoutingPrototype
             cartesianChart1.AxisX[0].MinValue = now.Ticks - TimeSpan.FromSeconds(8).Ticks; //we only care about the last 8 seconds
         }
 
-        public void updatePlot(float skeinValue, float nonSkeinValue)
+        public void updatePlot(bool isSkiening, float worstSkeinValue, float bestSkeinValue, float nonSkeinValue)
         {
             var now = System.DateTime.Now;
 
-            ChartValuesSkeining.Add(new MeasureModel
+            // Calculats total cost in the past 5 seconds
+            worstSkeinCostFiveSecs.Enqueue(worstSkeinValue);
+            float oldWorstSkeinCost = worstSkeinCostFiveSecs.Dequeue();
+            bestSkeinCostFiveSecs.Enqueue(bestSkeinValue);
+            float oldBestSkeinCost = bestSkeinCostFiveSecs.Dequeue();
+            nonSkeinCostFiveSecs.Enqueue(nonSkeinValue);
+            float oldNonSkeinCost = nonSkeinCostFiveSecs.Dequeue();
+
+            ChartValuesWorstSkeining.Add(new MeasureModel
             {
                 DateTime = now,
-                Value = skeinValue
+                Value = worstSkeinValue - oldWorstSkeinCost
+            });
+
+            ChartValuesBestSkeining.Add(new MeasureModel
+            {
+                DateTime = now,
+                Value = bestSkeinValue - oldBestSkeinCost
             });
 
             ChartValuesNonSkeining.Add(new MeasureModel
             {
                 DateTime = now,
-                Value = nonSkeinValue
+                Value = nonSkeinValue - oldNonSkeinCost
             });
+
+            if (!isSkiening)
+            {
+                ChartValuesWorstSkeining.Clear();
+                ChartValuesBestSkeining.Clear();
+            }
 
             SetAxisLimits(now);
 
             //lets only use the last 10 values
-            if (ChartValuesSkeining.Count > 10) ChartValuesSkeining.RemoveAt(0);
+            if (ChartValuesWorstSkeining.Count > 10) ChartValuesWorstSkeining.RemoveAt(0);
+            if (ChartValuesBestSkeining.Count > 10) ChartValuesBestSkeining.RemoveAt(0);
             if (ChartValuesNonSkeining.Count > 10) ChartValuesNonSkeining.RemoveAt(0);
 
         }
