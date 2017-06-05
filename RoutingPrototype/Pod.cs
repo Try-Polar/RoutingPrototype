@@ -152,10 +152,10 @@ namespace RoutingPrototype
                     }
                 }  
             }
-            if ((mGoal - Position).Length() < 2)
+            if ((mGoal - Position).Length() < 2)// if arrived at current goal
             {
-                if (mJourneyStarted)
-                    journeyEnded();
+                if (mJourneyStarted) //if journey had been started
+                    journeyEnded(); //end journey
                 mJourneyStarted = false;
             }
             else

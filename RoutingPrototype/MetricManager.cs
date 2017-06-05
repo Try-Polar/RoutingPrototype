@@ -42,11 +42,13 @@ namespace RoutingPrototype
                 {
                     float val = (pod.NonSkeinDistanceTravelled - pod.TheoreticalDistanceTravelled) * mPixelToKilometerConverter;
                     if (val > 3.3f)
-                        mKilometresSavedBySkeins += (pod.NonSkeinDistanceTravelled - pod.TheoreticalDistanceTravelled) * mPixelToKilometerConverter; //Seems to misjudge a little so -1 essentially corrects this
+                       mKilometresSavedBySkeins += (pod.NonSkeinDistanceTravelled - pod.TheoreticalDistanceTravelled) * mPixelToKilometerConverter; //Seems to misjudge a little so -1 essentially corrects this
                     mKilometresNonSkeinTravelled += (pod.NonSkeinDistanceTravelled - 1.5f) * mPixelToKilometerConverter;
                     mKilometresSkeinTravelled += (pod.TheoreticalDistanceTravelled - 1.5f) * mPixelToKilometerConverter;
                     mKilometresTravelled += (pod.RealDistanceTravelled - 1.5f) * mPixelToKilometerConverter;
-
+                    //floating port to liverpool
+                    Console.WriteLine(Vector2.Distance(new Vector2(789, 344), new Vector2(490, 469)));
+                    //NonSkein = 627, Theoretical = 321
                     pod.newData = false;
                 }
             }
