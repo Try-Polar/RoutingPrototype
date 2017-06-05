@@ -42,6 +42,8 @@ namespace RoutingPrototype
 
         Vector2 mCurrentVector;
 
+        Vector2 mJourneyStartLocation;
+
 
         float mEnergy = 300;
         float mMinimumEnergyThreshold = 5;
@@ -424,11 +426,13 @@ namespace RoutingPrototype
 
             mTheoreticalDistTravelledOnJourney = 0;
             mRealDistTravelledOnJourney = 0;
-            mMaxDistanceTravelled = (endPoint - Position).Length();
+            mJourneyStartLocation = Position;
+            //mMaxDistanceTravelled = (endPoint - Position).Length();
         }
 
         void journeyEnded()
         {
+            mMaxDistanceTravelled = (mJourneyStartLocation - Position).Length();
             newData = true;
             //mTotalDistTravelledOnJourney = mTheoreticalDistTravelledOnJourney * mDistMulti;
             //mTotalMaxDistanceTravelled = mMaxDistanceTravelled * mDistMulti;

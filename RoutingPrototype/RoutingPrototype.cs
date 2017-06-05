@@ -52,8 +52,8 @@ namespace RoutingPrototype
         LivePlot plot;  // form displaying plot of metrics
         DispatcherTimer dispatcherTimer;    // timer for plotting data every second
 
-        int SCREEN_WIDTH = 1200;
-        int SCREEN_HEIGHT = 900;
+        int SCREEN_WIDTH = 800;
+        int SCREEN_HEIGHT = 600;
         int MAP_WIDTH;
         int MAP_HEIGHT;
 
