@@ -30,6 +30,7 @@ namespace RoutingPrototype
         Rectangle boatBackgroundRectangle;
         Texture2D skyBackground;
         Rectangle skyBackgroundRectangle;
+        Texture2D cityPodTexture;
 
         SpriteFont metricFont;
 
@@ -132,13 +133,14 @@ namespace RoutingPrototype
             boatBackgroundRectangle = new Rectangle(0, 0, MAP_WIDTH, MAP_HEIGHT);
             skyBackground = Content.Load<Texture2D>("SkyBackground");
             skyBackgroundRectangle = new Rectangle((int)((float)SCREEN_WIDTH * 0.75f), (int)((float)SCREEN_HEIGHT / 3), 1000, 1000);
+            cityPodTexture = Content.Load<Texture2D>("PodWithoutWingsRecaled"); //I know this is spelt wrong I typo'ed on the image itself and its easier to just leave it
 
             metricFont = Content.Load<SpriteFont>("Metric");
 
             formationManager = new FormationManager(formationPodTexture, new Vector2(SCREEN_WIDTH, SCREEN_HEIGHT));
             UKcityManager = new CityManager(cityTexture, MAP_WIDTH, MAP_HEIGHT);
             UKrouteManager = new RouteManager(destinationTexture, lineTexture, MAP_WIDTH, MAP_HEIGHT, Simulation.UK, UKcityManager);
-            UKcityPodManager = new CityPodManager(podTexture, SCREEN_WIDTH, SCREEN_HEIGHT, new Vector2((SCREEN_WIDTH * 7) / 8, SCREEN_HEIGHT / 2), collabCityTexture);
+            UKcityPodManager = new CityPodManager(podTexture, SCREEN_WIDTH, SCREEN_HEIGHT, new Vector2((SCREEN_WIDTH * 7) / 8, SCREEN_HEIGHT / 2), collabCityTexture, cityPodTexture);
             UKpodManager = new PodManager(podTexture, destinationTexture, UKrouteManager, UKcityManager.Cities[0].Position, UKKilometerToPixelMultiplier, UKHourToSecondMultiplier, UKcityPodManager);
             UKmetricManager = new MetricManager(UKpodManager, UKpixelReference, UKKilometerReference, metricFont, new Vector2(SCREEN_WIDTH * 0.75f, SCREEN_HEIGHT * 2 / 3));
        

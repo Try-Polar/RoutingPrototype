@@ -23,6 +23,8 @@ namespace RoutingPrototype
         Vector2 mTakeOffTarget;
         Vector2 mExitPoint;
 
+        Texture2D mCityPodTexture;
+
         Pod mPod;
 
         float mMass = 0.05f;
@@ -31,7 +33,7 @@ namespace RoutingPrototype
 
         Vector2 mTarget;
 
-        public CityPod(Texture2D texture, Vector2 pos, float screenWidth, Vector2 cityCenter, Vector2 takeOffDirection, int rndX, int rndY, Pod pod, int cityRadius) : base (texture, pos)
+        public CityPod(Texture2D texture, Vector2 pos, float screenWidth, Vector2 cityCenter, Vector2 takeOffDirection, int rndX, int rndY, Pod pod, int cityRadius, Texture2D cityPodTexture) : base (texture, pos)
         {
             mCityRadius = cityRadius;
             mCityCenter = cityCenter;
@@ -43,6 +45,7 @@ namespace RoutingPrototype
             maxVelocity = 1;
             mTarget = mCityCenter;
             mPod = pod;
+            mCityPodTexture = cityPodTexture;
         }
 
         public void Update(GameTime gameTime)
@@ -102,7 +105,17 @@ namespace RoutingPrototype
         {
             spriteBatch.Begin();
             //spriteBatch.Draw(Texture, Rect, Color.White);
-            spriteBatch.Draw(this.Texture, this.Position, new Rectangle(0, 0, Texture.Width, Texture.Height), Color.White, getCurrentAngle(), this.Origin(), 1, SpriteEffects.None, 0);
+            if (mCurrentStatus == STATUS.centering || mCurrentStatus == STATUS.leaving)
+            {
+                Vector2 origin;
+                origin.X = mCityPodTexture.Width / 2;
+                origin.Y = mCityPodTexture.Height / 2;
+                spriteBatch.Draw(mCityPodTexture, this.Position, new Rectangle(0, 0, mCityPodTexture.Width, mCityPodTexture.Height), Color.White, getCurrentAngle() + PI, origin, 1, SpriteEffects.None, 0);
+            }
+            else
+            {
+                spriteBatch.Draw(this.Texture, this.Position, new Rectangle(0, 0, Texture.Width, Texture.Height), Color.White, getCurrentAngle(), this.Origin(), 1, SpriteEffects.None, 0);
+            }
             spriteBatch.End();
         }
 
