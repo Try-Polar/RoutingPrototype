@@ -16,7 +16,7 @@ namespace RoutingPrototype
         Texture2D mPodTexture;
         Texture2D mDestinationTexture;
 
-        int initialNumberOfPods = 50;
+        int initialNumberOfPods = 150;
 
         int currentId = 1;
 
@@ -25,15 +25,17 @@ namespace RoutingPrototype
 
         RouteManager mRouteManager;
         CityPodManager mCityPodManger;
+        CityManager mCityManager;
         float mDistMulti;
         float mTimeMulti;
 
         bool mCreatingSkeins;
 
-        public PodManager(Texture2D podText, Texture2D destinationText, RouteManager routeManager, Vector2 startLocation, float distMulti, float timeMulti, CityPodManager cityPodManager = null)
+        public PodManager(Texture2D podText, Texture2D destinationText, RouteManager routeManager, Vector2 startLocation, float distMulti, float timeMulti, CityPodManager cityPodManager = null, CityManager cityManager = null)
         {
             mPodTexture = podText;
             mDestinationTexture = destinationText;
+            mCityManager = cityManager;
 
             mPods = new List<Pod>();
             mFreePods = new List<Pod>();
@@ -53,7 +55,7 @@ namespace RoutingPrototype
             {
                 mCreatingSkeins = false;
                 for (int i = 0; i < initialNumberOfPods; i++)
-                    mPods.Add(new Pod(mPodTexture, mDestinationTexture, startLocation, routeManager.CityManager, rnd.Next(), currentId++, mDistMulti, mTimeMulti, cityPodManager));
+                    mPods.Add(new Pod(mPodTexture, mDestinationTexture, mCityManager.Cities[rnd.Next(mCityManager.Cities.Count)].Position, routeManager.CityManager, rnd.Next(), currentId++, mDistMulti, mTimeMulti, cityPodManager));
             }
             else
             {

@@ -46,9 +46,6 @@ namespace RoutingPrototype
                     mKilometresNonSkeinTravelled += (pod.NonSkeinDistanceTravelled - 1.5f) * mPixelToKilometerConverter;
                     mKilometresSkeinTravelled += (pod.TheoreticalDistanceTravelled - 1.5f) * mPixelToKilometerConverter;
                     mKilometresTravelled += (pod.RealDistanceTravelled - 1.5f) * mPixelToKilometerConverter;
-                    //floating port to liverpool
-                    Console.WriteLine(Vector2.Distance(new Vector2(789, 344), new Vector2(490, 469)));
-                    //NonSkein = 627, Theoretical = 321
                     pod.newData = false;
                 }
             }
@@ -87,6 +84,15 @@ namespace RoutingPrototype
         {
             get { return mJourneysCompleted; }
             set { mJourneysCompleted = value; }
+        }
+
+        public void resetMetrics()
+        {
+            mKilometresSavedBySkeins = 0;
+            mKilometresNonSkeinTravelled = 0; // The actual distance travelled not in a skein
+            mKilometresSkeinTravelled = 0;    // The theoretical (smaller) distance travelled in skeins
+            mKilometresTravelled = 0;
+
         }
     }
 }

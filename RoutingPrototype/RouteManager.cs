@@ -16,7 +16,7 @@ namespace RoutingPrototype
         float mYResolutionScaler;
         int mMapWidth;
 
-        float mSpawnInterval = 0.05f;
+        float mSpawnInterval = 0.01f;
         float mSpawnTimer = 0;
 
         List<Route> mUnassignedRoutes;
@@ -142,15 +142,15 @@ namespace RoutingPrototype
             int x = 0;
             if (y < 50 * mYResolutionScaler)
             {
-                x = rnd.Next((int)(225 * mXResolutionScaler), mMapWidth - 10);
+                x = rnd.Next((int)(225 * mXResolutionScaler), mScreenWidth - 10);
             }
             else if (y >= 50 * mYResolutionScaler && y < 200 * mYResolutionScaler)
             {
-                x = rnd.Next((int)(300 * mXResolutionScaler), mMapWidth - 10);
+                x = rnd.Next((int)(300 * mXResolutionScaler), mScreenWidth - 10);
             }
             else if ( y >= 200 * mYResolutionScaler)
             {
-                x = rnd.Next((int)(240 * mXResolutionScaler), mMapWidth - 10);
+                x = rnd.Next((int)(240 * mXResolutionScaler), mScreenWidth - 10);
             }
             dropOffLoc.X = x;
             dropOffLoc.Y = y;

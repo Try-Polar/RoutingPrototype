@@ -31,6 +31,7 @@ namespace RoutingPrototype
         Texture2D skyBackground;
         Rectangle skyBackgroundRectangle;
         Texture2D cityPodTexture;
+        Texture2D backgroundPane;
 
         SpriteFont metricFont;
 
@@ -134,6 +135,7 @@ namespace RoutingPrototype
             skyBackground = Content.Load<Texture2D>("SkyBackground");
             skyBackgroundRectangle = new Rectangle((int)((float)SCREEN_WIDTH * 0.75f), (int)((float)SCREEN_HEIGHT / 3), 1000, 1000);
             cityPodTexture = Content.Load<Texture2D>("PodWithoutWingsRecaled"); //I know this is spelt wrong I typo'ed on the image itself and its easier to just leave it
+            backgroundPane = Content.Load<Texture2D>("BackgroundPane");
 
             metricFont = Content.Load<SpriteFont>("Metric");
 
@@ -141,7 +143,7 @@ namespace RoutingPrototype
             UKcityManager = new CityManager(cityTexture, MAP_WIDTH, MAP_HEIGHT);
             UKrouteManager = new RouteManager(destinationTexture, lineTexture, MAP_WIDTH, MAP_HEIGHT, Simulation.UK, UKcityManager);
             UKcityPodManager = new CityPodManager(podTexture, SCREEN_WIDTH, SCREEN_HEIGHT, new Vector2((SCREEN_WIDTH * 7) / 8, SCREEN_HEIGHT / 2), collabCityTexture, cityPodTexture);
-            UKpodManager = new PodManager(podTexture, destinationTexture, UKrouteManager, UKcityManager.Cities[0].Position, UKKilometerToPixelMultiplier, UKHourToSecondMultiplier, UKcityPodManager);
+            UKpodManager = new PodManager(podTexture, destinationTexture, UKrouteManager, Vector2.Zero, UKKilometerToPixelMultiplier, UKHourToSecondMultiplier, UKcityPodManager, UKcityManager);
             UKmetricManager = new MetricManager(UKpodManager, UKpixelReference, UKKilometerReference, metricFont, new Vector2(SCREEN_WIDTH * 0.75f, SCREEN_HEIGHT * 2 / 3));
        
             
@@ -222,6 +224,7 @@ namespace RoutingPrototype
             if (newState.IsKeyUp(Keys.Space) && oldState.IsKeyDown(Keys.Space))
             {
                 UKpodManager.clearJourneysCompleted();
+                UKmetricManager.resetMetrics();
                 if (UKpodManager.CreatingSkeins)
                     UKpodManager.CreatingSkeins = false;
                 else
@@ -259,6 +262,7 @@ namespace RoutingPrototype
             if (currentSimulation == Simulation.Boat)
             {
                 spriteBatch.Begin();
+                spriteBatch.Draw(backgroundPane, new Rectangle((int)((float)SCREEN_WIDTH * 0.75f), 0, SCREEN_WIDTH, SCREEN_HEIGHT), Color.White);
                 spriteBatch.Draw(boatBackground, boatBackgroundRectangle, Color.White);
                 spriteBatch.Draw(cityTexture, new Rectangle((int)boatRouteManager.PortLocation.X, (int)boatRouteManager.PortLocation.Y, cityTexture.Width, cityTexture.Height), Color.White);
                 spriteBatch.End();
