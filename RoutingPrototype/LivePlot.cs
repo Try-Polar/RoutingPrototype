@@ -98,7 +98,7 @@ namespace RoutingPrototype
                 FontSize = fontSize,
                 Foreground = System.Windows.Media.Brushes.White,
                 DisableAnimations = true,
-                LabelFormatter = value => value + " h",
+                LabelFormatter = value => value.ToString("#.##") + " h",
                 Separator = new Separator
                 {
                     Step = 0.4
