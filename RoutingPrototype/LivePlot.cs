@@ -20,6 +20,8 @@ namespace RoutingPrototype
         private Queue<float> bestSkeinCostFiveSecs; // Best forecast skein cost values past 5 seconds
         private Queue<float> nonSkeinCostFiveSecs; // Non skein cost values past 5 seconds
 
+        private float timePassed = 0;
+
         public LivePlot()
         {
             InitializeComponent();
@@ -43,7 +45,7 @@ namespace RoutingPrototype
             //you can configure series in many ways, learn more at http://lvcharts.net/App/examples/v1/wpf/Types%20and%20Configuration
 
             var mapper = Mappers.Xy<MeasureModel>()
-                .X(model => model.DateTime.Ticks)   //use DateTime.Ticks as X
+                .X(model => model.Time)             //use Time as X
                 .Y(model => model.Value);           //use the value property as Y
             
             //lets save the mapper globally.
@@ -58,7 +60,7 @@ namespace RoutingPrototype
             {
                 new LineSeries
                 {
-                    Title = "Worst Case Skyline Cost (£) \r With Skeining (past 2 hours)",
+                    Title = "Worst Case Operation Cost \r With Skeining (past 2 hours)",
                     FontSize = fontSize,
                     Foreground = System.Windows.Media.Brushes.White,
                     Values = ChartValuesWorstSkeining,
@@ -69,7 +71,7 @@ namespace RoutingPrototype
 
                 new LineSeries
                 {
-                    Title = "Best Case Skyline Cost (£) \r With Skeining (past 2 hours)",
+                    Title = "Best Case Skyline Operation \r With Skeining (past 2 hours)",
                     FontSize = fontSize,
                     Foreground = System.Windows.Media.Brushes.White,
                     Values = ChartValuesBestSkeining,
@@ -80,7 +82,7 @@ namespace RoutingPrototype
 
                 new LineSeries
                 {
-                    Title = "Skyline Cost (£) \r Without Skeining (past 2 hours)",
+                    Title = "Operation Cost \r Without Skeining (past 2 hours)",
                     FontSize = fontSize,
                     Foreground = System.Windows.Media.Brushes.White,
                     Values = ChartValuesNonSkeining,
@@ -92,36 +94,35 @@ namespace RoutingPrototype
 
             cartesianChart1.AxisX.Add(new Axis
             {
-                Title = "Time",
+                Title = "Time Elaspsed (hours)",
                 FontSize = fontSize,
                 Foreground = System.Windows.Media.Brushes.White,
                 DisableAnimations = true,
-                LabelFormatter = value => new System.DateTime((long)value).ToString("mm:ss"),
+                LabelFormatter = value => value + " h",
                 Separator = new Separator
                 {
-                    Step = TimeSpan.FromSeconds(1).Ticks
+                    Step = 0.4
                 }
             });
 
             cartesianChart1.AxisY.Add(new Axis
             {
-                Title = "Skyline Cost (£) for past 2 hours",
+                Title = "Operation Cost for past 2 hours",
                 FontSize = fontSize,
                 Foreground = System.Windows.Media.Brushes.White,
-                
-            });
+                LabelFormatter = val => val.ToString("C") //as currency,
+
+        });
 
             cartesianChart1.LegendLocation = LegendLocation.Right;
             cartesianChart1.DefaultLegend.Foreground = System.Windows.Media.Brushes.White;
             SetAxisLimits(System.DateTime.Now);
-
-
         }
 
         private void SetAxisLimits(System.DateTime now)
         {
-            cartesianChart1.AxisX[0].MaxValue = now.Ticks + TimeSpan.FromSeconds(1).Ticks; // lets force the axis to be 100ms ahead
-            cartesianChart1.AxisX[0].MinValue = now.Ticks - TimeSpan.FromSeconds(8).Ticks; //we only care about the last 8 seconds
+            cartesianChart1.AxisX[0].MaxValue = timePassed + 0.4; // lets force the axis to be 100ms ahead
+            cartesianChart1.AxisX[0].MinValue = timePassed - 3; //we only care about the last 8 seconds
         }
 
         public void updatePlot(bool isSkiening, float worstSkeinValue, float bestSkeinValue, float nonSkeinValue)
@@ -138,19 +139,19 @@ namespace RoutingPrototype
 
             ChartValuesWorstSkeining.Add(new MeasureModel
             {
-                DateTime = now,
+                Time = timePassed,
                 Value = worstSkeinValue - oldWorstSkeinCost
             });
 
             ChartValuesBestSkeining.Add(new MeasureModel
             {
-                DateTime = now,
+                Time = timePassed,
                 Value = bestSkeinValue - oldBestSkeinCost
             });
 
             ChartValuesNonSkeining.Add(new MeasureModel
             {
-                DateTime = now,
+                Time = timePassed,
                 Value = nonSkeinValue - oldNonSkeinCost
             });
 
@@ -160,6 +161,8 @@ namespace RoutingPrototype
                 ChartValuesBestSkeining.Clear();
             }
 
+            timePassed += (float)0.4;
+
             SetAxisLimits(now);
 
             //lets only use the last 10 values
@@ -168,6 +171,16 @@ namespace RoutingPrototype
             if (ChartValuesNonSkeining.Count > 10) ChartValuesNonSkeining.RemoveAt(0);
 
         }
+
+        public void clearPlot()
+        {
+            // Populate total skien cost in the past 5 seconds queues 
+            List<float> list = new List<float> { 0, 0, 0, 0, 0 };
+            worstSkeinCostFiveSecs = new Queue<float>(list);
+            bestSkeinCostFiveSecs = new Queue<float>(list);
+            nonSkeinCostFiveSecs = new Queue<float>(list);
+        }
+
 
     }
 }

@@ -2,7 +2,8 @@
 {
     public class MeasureModel
     {
-        public System.DateTime DateTime { get; set; }
+        //public System.DateTime DateTime { get; set; }
+        public float Time { get; set; }
         public float Value { get; set; }
     }
 }

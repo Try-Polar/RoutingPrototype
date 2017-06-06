@@ -101,6 +101,7 @@ namespace RoutingPrototype
 
             plot = new LivePlot();
             plot.Show();
+ 
             // Sets up timer to plot every second
             dispatcherTimer = new DispatcherTimer();
             dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
@@ -229,8 +230,9 @@ namespace RoutingPrototype
                     UKpodManager.CreatingSkeins = false;
                 else
                     UKpodManager.CreatingSkeins = true;
-            }
 
+                plot.clearPlot();
+            }
 
             oldState = newState;
             base.Update(gameTime);
