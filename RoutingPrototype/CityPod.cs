@@ -41,7 +41,7 @@ namespace RoutingPrototype
             mTakeOffTarget = mCityCenter + (takeOffDirection * mCityRadius);
             takeOffDirection.X += rndX;
             takeOffDirection.Y += rndY;
-            mExitPoint = mCityCenter + (takeOffDirection * mCityRadius * 2);
+            mExitPoint = mCityCenter + (takeOffDirection * mCityRadius * 20);
             maxVelocity = 1;
             mTarget = mCityCenter;
             mPod = pod;

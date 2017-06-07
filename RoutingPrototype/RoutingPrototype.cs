@@ -62,6 +62,8 @@ namespace RoutingPrototype
         //FOR CREATION PURPOSES
         bool mouseJustPressed = false;
 
+        bool paused = false;
+
         float UKKilometerToPixelMultiplier; //Based on distance from london to bristol
         float UKHourToSecondMultiplier; //1 minute of real time is one day of simulation time
         float UKpixelReference = 212.1909f;
@@ -173,20 +175,23 @@ namespace RoutingPrototype
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-            formationManager.Update(gameTime);
-            if (currentSimulation == Simulation.UK)
+            if (!paused)
             {
-                UKpodManager.Update(gameTime);
-                UKrouteManager.Update(gameTime);
-                UKmetricManager.Update(gameTime);
-                UKcityPodManager.Update(gameTime);
-            }
-            if (currentSimulation == Simulation.Boat)
-            {
-                boatPodManager.Update(gameTime);
-                boatRouteManager.Update(gameTime);
-                //boatMetricManager.Update(gameTime);
-                //boatCityManager.Update(gameTime);
+                formationManager.Update(gameTime);
+                if (currentSimulation == Simulation.UK)
+                {
+                    UKpodManager.Update(gameTime);
+                    UKrouteManager.Update(gameTime);
+                    UKmetricManager.Update(gameTime);
+                    UKcityPodManager.Update(gameTime);
+                }
+                if (currentSimulation == Simulation.Boat)
+                {
+                    boatPodManager.Update(gameTime);
+                    boatRouteManager.Update(gameTime);
+                    //boatMetricManager.Update(gameTime);
+                    //boatCityManager.Update(gameTime);
+                }
             }
 
             //FOR THE PURPOSES OF SETTING UP CITIES ONLY
@@ -205,7 +210,15 @@ namespace RoutingPrototype
                 mousePosition.Y = mouseState.Y;
                 Console.WriteLine(mousePosition);
             }
+            
 
+            if (newState.IsKeyUp(Keys.S) && oldState.IsKeyDown(Keys.S))
+            {
+                if (paused)
+                    paused = false;
+                else
+                    paused = true;
+            }
             if (newState.IsKeyUp(Keys.P) && oldState.IsKeyDown(Keys.P))
             {
                 formationManager.addPod();
@@ -286,7 +299,8 @@ namespace RoutingPrototype
             float nonSkeinCost = (float)(distanceTravelled * 0.621371 * 29.64);     // Using cost of non-skein travelling
             float worstSkeinCost = (float)(distanceTravelled * 0.621371 * 28.88);     // Using cost of skein travelling (worst case)
             float bestSkeinCost = (float)(distanceTravelled * 0.621371 * 27.80);     // Using cost of skein travelling (best case)
-            plot.updatePlot(UKpodManager.CreatingSkeins, worstSkeinCost, bestSkeinCost, nonSkeinCost);
+            if (!paused)
+                plot.updatePlot(UKpodManager.CreatingSkeins, worstSkeinCost, bestSkeinCost, nonSkeinCost);
         }
     }
 }
