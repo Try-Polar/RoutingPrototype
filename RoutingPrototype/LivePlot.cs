@@ -60,7 +60,7 @@ namespace RoutingPrototype
             {
                 new LineSeries
                 {
-                    Title = "Worst Case Operation Cost \r With Skeining (past 2 hours)",
+                    Title = "Total Operation Cost For Past 2 Hours \r With Skeining (Worst Case)",
                     FontSize = fontSize,
                     Foreground = System.Windows.Media.Brushes.White,
                     Values = ChartValuesWorstSkeining,
@@ -71,7 +71,7 @@ namespace RoutingPrototype
 
                 new LineSeries
                 {
-                    Title = "Best Case Skyline Operation \r With Skeining (past 2 hours)",
+                    Title = "Total Operation Cost For Past 2 Hours \r With Skeining (Best Case)",
                     FontSize = fontSize,
                     Foreground = System.Windows.Media.Brushes.White,
                     Values = ChartValuesBestSkeining,
@@ -82,7 +82,7 @@ namespace RoutingPrototype
 
                 new LineSeries
                 {
-                    Title = "Operation Cost \r Without Skeining (past 2 hours)",
+                    Title = "Total Operation Cost For Past 2 Hours \r Without Skeining",
                     FontSize = fontSize,
                     Foreground = System.Windows.Media.Brushes.White,
                     Values = ChartValuesNonSkeining,
@@ -121,7 +121,7 @@ namespace RoutingPrototype
 
         private void SetAxisLimits(System.DateTime now)
         {
-            cartesianChart1.AxisX[0].MaxValue = timePassed + 0.4; // lets force the axis to be 100ms ahead
+            cartesianChart1.AxisX[0].MaxValue = timePassed; // lets force the axis to be 100ms ahead
             cartesianChart1.AxisX[0].MinValue = timePassed - 3; //we only care about the last 8 seconds
         }
 
